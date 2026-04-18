@@ -2,13 +2,36 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { AnimatePresence } from "motion/react";
-import { SCENES } from "@/lib/timeline";
+import { SCENES, type SceneId } from "@/lib/timeline";
 import { useKeyboard } from "@/lib/useKeyboard";
 import { useElapsed } from "@/lib/useElapsed";
 import { PresenterClock } from "./PresenterClock";
 import { TitleSlide } from "./scenes/TitleSlide";
 import { HLLHCHook } from "./scenes/HLLHCHook";
 import { PlaceholderScene } from "./scenes/PlaceholderScene";
+import { EasterRelease } from "./scenes/EasterRelease";
+import { EasterBug } from "./scenes/EasterBug";
+import { EasterSmokingGun } from "./scenes/EasterSmokingGun";
+import { EasterCrossEval } from "./scenes/EasterCrossEval";
+import { EasterDispatch } from "./scenes/EasterDispatch";
+import { EasterArchitecture } from "./scenes/EasterArchitecture";
+import { EasterDiscovery } from "./scenes/EasterDiscovery";
+import { EasterReveal } from "./scenes/EasterReveal";
+import { EasterThesis } from "./scenes/EasterThesis";
+
+const SCENE_COMPONENTS: Partial<Record<SceneId, () => React.ReactElement>> = {
+  title: TitleSlide,
+  hllhc: HLLHCHook,
+  easter1Release: EasterRelease,
+  easter2Bug: EasterBug,
+  easter3SmokingGun: EasterSmokingGun,
+  easter4CrossEval: EasterCrossEval,
+  easter5Dispatch: EasterDispatch,
+  easter6Architecture: EasterArchitecture,
+  easter7Discovery: EasterDiscovery,
+  easter8Reveal: EasterReveal,
+  easter9Thesis: EasterThesis,
+};
 
 export function Stage() {
   const [idx, setIdx] = useState(0);
@@ -42,14 +65,9 @@ export function Stage() {
   });
 
   const rendered = useMemo(() => {
-    switch (scene.id) {
-      case "title":
-        return <TitleSlide key="title" />;
-      case "hllhc":
-        return <HLLHCHook key="hllhc" />;
-      default:
-        return <PlaceholderScene key={scene.id} id={scene.id} label={scene.label} act={scene.act} />;
-    }
+    const Comp = SCENE_COMPONENTS[scene.id];
+    if (Comp) return <Comp key={scene.id} />;
+    return <PlaceholderScene key={scene.id} id={scene.id} label={scene.label} act={scene.act} />;
   }, [scene]);
 
   return (
