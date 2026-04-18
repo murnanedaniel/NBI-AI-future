@@ -53,8 +53,27 @@ export function Stage() {
   }, [scene]);
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-canvas">
+    <div
+      className="relative w-screen h-screen overflow-hidden bg-canvas cursor-pointer select-none"
+      onClick={advance}
+      role="button"
+      tabIndex={0}
+    >
       <AnimatePresence mode="wait">{rendered}</AnimatePresence>
+
+      <button
+        type="button"
+        aria-label="Restart from the beginning"
+        onClick={(e) => {
+          e.stopPropagation();
+          restart();
+        }}
+        className="fixed top-4 right-4 z-50 h-9 px-3 flex items-center gap-1.5 rounded-full bg-black/50 hover:bg-black/70 active:bg-black/90 backdrop-blur border border-white/10 text-[11px] font-mono text-zinc-300 transition"
+      >
+        <span className="text-sm leading-none">↺</span>
+        <span>reset</span>
+      </button>
+
       {clockVisible && (
         <PresenterClock
           elapsed={elapsed}
