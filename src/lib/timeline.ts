@@ -11,7 +11,8 @@ export type SceneId =
   | "easter8Reveal"
   | "easter9Thesis"
   | "easter10WhyPossible"
-  | "hinge"
+  | "statsFeint"
+  | "matchmaking"
   | "undergrad2031"
   | "phd2031"
   | "faculty2031"
@@ -19,12 +20,15 @@ export type SceneId =
   | "mondayMorning"
   | "close";
 
+export type Theme = "dark" | "light";
+
 export type Scene = {
   id: SceneId;
   label: string;
   act: 1 | 2 | 3 | 4;
   startSec: number;
   endSec: number;
+  theme?: Theme;
 };
 
 export const SCENES: Scene[] = [
@@ -42,13 +46,14 @@ export const SCENES: Scene[] = [
   { id: "easter9Thesis",       label: "Easter · meta-thesis",        act: 2, startSec: 450,  endSec: 480  },
   { id: "easter10WhyPossible", label: "Easter · why possible",       act: 2, startSec: 480,  endSec: 510  },
 
-  { id: "hinge",               label: "Live Claude + Q",             act: 2, startSec: 510,  endSec: 570  },
-  { id: "undergrad2031",       label: "Undergrad 2031",              act: 3, startSec: 570,  endSec: 750  },
-  { id: "phd2031",             label: "PhD 2031",                    act: 3, startSec: 750,  endSec: 870  },
-  { id: "faculty2031",         label: "Faculty 2031",                act: 3, startSec: 870,  endSec: 930  },
-  { id: "wordcloud",           label: "Audience word cloud",         act: 3, startSec: 930,  endSec: 960  },
-  { id: "mondayMorning",       label: "Monday morning: 3 bets",      act: 4, startSec: 960,  endSec: 1140 },
-  { id: "close",               label: "Close",                       act: 4, startSec: 1140, endSec: 1200 },
+  { id: "statsFeint",          label: "Stats feint → collapse",      act: 3, startSec: 510,  endSec: 540  },
+  { id: "matchmaking",         label: "Live matchmaking",            act: 3, startSec: 540,  endSec: 660, theme: "light" },
+  { id: "undergrad2031",       label: "Undergrad 2031",              act: 3, startSec: 660,  endSec: 800, theme: "light" },
+  { id: "phd2031",             label: "PhD 2031",                    act: 3, startSec: 800,  endSec: 900, theme: "light" },
+  { id: "faculty2031",         label: "Faculty 2031",                act: 3, startSec: 900,  endSec: 960, theme: "light" },
+  { id: "wordcloud",           label: "Audience word cloud",         act: 3, startSec: 960,  endSec: 990, theme: "light" },
+  { id: "mondayMorning",       label: "Monday morning: 3 bets",      act: 4, startSec: 990,  endSec: 1140, theme: "light" },
+  { id: "close",               label: "Close",                       act: 4, startSec: 1140, endSec: 1200, theme: "light" },
 ];
 
 export const TOTAL_SEC = 1200;

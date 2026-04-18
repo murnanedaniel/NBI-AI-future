@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { SCENES, type SceneId } from "@/lib/timeline";
 import { useKeyboard } from "@/lib/useKeyboard";
 import { useElapsed } from "@/lib/useElapsed";
@@ -19,6 +19,8 @@ import { EasterDiscovery } from "./scenes/EasterDiscovery";
 import { EasterReveal } from "./scenes/EasterReveal";
 import { EasterThesis } from "./scenes/EasterThesis";
 import { EasterWhyPossible } from "./scenes/EasterWhyPossible";
+import { StatsFeint } from "./scenes/StatsFeint";
+import { Matchmaking } from "./scenes/Matchmaking";
 
 const SCENE_COMPONENTS: Partial<Record<SceneId, () => React.ReactElement>> = {
   title: TitleSlide,
@@ -33,6 +35,8 @@ const SCENE_COMPONENTS: Partial<Record<SceneId, () => React.ReactElement>> = {
   easter8Reveal: EasterReveal,
   easter9Thesis: EasterThesis,
   easter10WhyPossible: EasterWhyPossible,
+  statsFeint: StatsFeint,
+  matchmaking: Matchmaking,
 };
 
 export function Stage() {
@@ -44,6 +48,7 @@ export function Stage() {
   const { elapsed, reset } = useElapsed(running);
 
   const scene = SCENES[idx];
+  const theme = scene.theme ?? "dark";
 
   const advance = useCallback(() => {
     setRunning(true);
@@ -73,11 +78,13 @@ export function Stage() {
   }, [scene]);
 
   return (
-    <div
-      className="relative w-screen h-screen overflow-hidden bg-canvas cursor-pointer select-none"
+    <motion.div
+      className={`relative w-screen h-screen overflow-hidden cursor-pointer select-none ${theme === "light" ? "theme-light" : ""}`}
       onClick={advance}
       role="button"
       tabIndex={0}
+      animate={{ backgroundColor: theme === "light" ? "#f6f1e7" : "#050607" }}
+      transition={{ duration: 1.2, ease: [0.65, 0, 0.3, 1] }}
     >
       <AnimatePresence mode="wait">{rendered}</AnimatePresence>
 
@@ -88,7 +95,11 @@ export function Stage() {
           e.stopPropagation();
           restart();
         }}
-        className="fixed top-4 right-4 z-50 h-9 px-3 flex items-center gap-1.5 rounded-full bg-black/50 hover:bg-black/70 active:bg-black/90 backdrop-blur border border-white/10 text-[11px] font-mono text-zinc-300 transition"
+        className={`fixed top-4 right-4 z-50 h-9 px-3 flex items-center gap-1.5 rounded-full backdrop-blur border text-[11px] font-mono transition ${
+          theme === "light"
+            ? "bg-white/60 hover:bg-white/80 border-ink/10 text-ink/70"
+            : "bg-black/50 hover:bg-black/70 border-white/10 text-zinc-300"
+        }`}
       >
         <span className="text-sm leading-none">↺</span>
         <span>reset</span>
@@ -103,6 +114,6 @@ export function Stage() {
           running={running}
         />
       )}
-    </div>
+    </motion.div>
   );
 }

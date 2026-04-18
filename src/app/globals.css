@@ -55,3 +55,26 @@ body {
   pointer-events: none;
   background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%);
 }
+
+.theme-light {
+  --canvas: #f6f1e7;
+  --grid: rgba(20, 20, 20, 0.055);
+  --accent: #0369a1;
+  --accent-warm: #b45309;
+  color: #141414;
+}
+
+.theme-light .paper-grid {
+  background-image:
+    linear-gradient(to right, rgba(20,20,20,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20,20,20,0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.theme-light .vignette::after {
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(120,100,60,0.14) 100%);
+}
+
+.ink-shadow {
+  box-shadow: 0 14px 40px -14px rgba(20,20,20,0.25), 0 0 0 1px rgba(20,20,20,0.08);
+}
