@@ -18,6 +18,7 @@ import { EasterArchitecture } from "./scenes/EasterArchitecture";
 import { EasterDiscovery } from "./scenes/EasterDiscovery";
 import { EasterReveal } from "./scenes/EasterReveal";
 import { EasterThesis } from "./scenes/EasterThesis";
+import { EasterWhyPossible } from "./scenes/EasterWhyPossible";
 
 const SCENE_COMPONENTS: Partial<Record<SceneId, () => React.ReactElement>> = {
   title: TitleSlide,
@@ -31,6 +32,7 @@ const SCENE_COMPONENTS: Partial<Record<SceneId, () => React.ReactElement>> = {
   easter7Discovery: EasterDiscovery,
   easter8Reveal: EasterReveal,
   easter9Thesis: EasterThesis,
+  easter10WhyPossible: EasterWhyPossible,
 };
 
 export function Stage() {

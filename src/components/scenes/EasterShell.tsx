@@ -5,13 +5,14 @@ import type { ReactNode } from "react";
 
 type Props = {
   beat: number;
+  total?: number;
   children: ReactNode;
   headline?: ReactNode;
   hint?: ReactNode;
   align?: "center" | "top";
 };
 
-export function EasterShell({ beat, children, headline, hint, align = "center" }: Props) {
+export function EasterShell({ beat, total = 10, children, headline, hint, align = "center" }: Props) {
   return (
     <motion.div
       className="absolute inset-0 canvas-grid vignette overflow-hidden"
@@ -23,7 +24,7 @@ export function EasterShell({ beat, children, headline, hint, align = "center" }
         <div className="flex items-start justify-between">
           <div>
             <div className="text-[11px] uppercase tracking-[0.3em] text-sky-300/70">
-              Act 2 · Easter beamspot study · {beat}/9
+              Act 2 · Easter beamspot study · {beat}/{total}
             </div>
             {headline && (
               <div className="mt-2 text-[clamp(26px,3.3vw,44px)] font-serif italic text-zinc-100 leading-tight max-w-[780px]">

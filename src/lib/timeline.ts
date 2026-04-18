@@ -10,6 +10,7 @@ export type SceneId =
   | "easter7Discovery"
   | "easter8Reveal"
   | "easter9Thesis"
+  | "easter10WhyPossible"
   | "hinge"
   | "undergrad2031"
   | "phd2031"
@@ -39,13 +40,14 @@ export const SCENES: Scene[] = [
   { id: "easter7Discovery",    label: "Easter · vertex discovery",   act: 2, startSec: 345,  endSec: 410  },
   { id: "easter8Reveal",       label: "Easter · reveal",             act: 2, startSec: 410,  endSec: 450  },
   { id: "easter9Thesis",       label: "Easter · meta-thesis",        act: 2, startSec: 450,  endSec: 480  },
+  { id: "easter10WhyPossible", label: "Easter · why possible",       act: 2, startSec: 480,  endSec: 510  },
 
-  { id: "hinge",               label: "Live Claude + Q",             act: 2, startSec: 480,  endSec: 540  },
-  { id: "undergrad2031",       label: "Undergrad 2031",              act: 3, startSec: 540,  endSec: 720  },
-  { id: "phd2031",             label: "PhD 2031",                    act: 3, startSec: 720,  endSec: 840  },
-  { id: "faculty2031",         label: "Faculty 2031",                act: 3, startSec: 840,  endSec: 900  },
-  { id: "wordcloud",           label: "Audience word cloud",         act: 3, startSec: 900,  endSec: 930  },
-  { id: "mondayMorning",       label: "Monday morning: 3 bets",      act: 4, startSec: 930,  endSec: 1140 },
+  { id: "hinge",               label: "Live Claude + Q",             act: 2, startSec: 510,  endSec: 570  },
+  { id: "undergrad2031",       label: "Undergrad 2031",              act: 3, startSec: 570,  endSec: 750  },
+  { id: "phd2031",             label: "PhD 2031",                    act: 3, startSec: 750,  endSec: 870  },
+  { id: "faculty2031",         label: "Faculty 2031",                act: 3, startSec: 870,  endSec: 930  },
+  { id: "wordcloud",           label: "Audience word cloud",         act: 3, startSec: 930,  endSec: 960  },
+  { id: "mondayMorning",       label: "Monday morning: 3 bets",      act: 4, startSec: 960,  endSec: 1140 },
   { id: "close",               label: "Close",                       act: 4, startSec: 1140, endSec: 1200 },
 ];
 
