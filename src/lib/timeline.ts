@@ -13,6 +13,7 @@ export type SceneId =
   | "easter10WhyPossible"
   | "statsFeint"
   | "matchmaking"
+  | "act3Preamble"
   | "undergrad2031"
   | "phd2031"
   | "faculty2031"
@@ -48,11 +49,12 @@ export const SCENES: Scene[] = [
 
   { id: "statsFeint",          label: "Stats feint → collapse",      act: 3, startSec: 510,  endSec: 540  },
   { id: "matchmaking",         label: "Live matchmaking",            act: 3, startSec: 540,  endSec: 660, theme: "light" },
-  { id: "undergrad2031",       label: "Undergrad 2031",              act: 3, startSec: 660,  endSec: 800, theme: "light" },
-  { id: "phd2031",             label: "PhD 2031",                    act: 3, startSec: 800,  endSec: 900, theme: "light" },
-  { id: "faculty2031",         label: "Faculty 2031",                act: 3, startSec: 900,  endSec: 960, theme: "light" },
-  { id: "wordcloud",           label: "Audience word cloud",         act: 3, startSec: 960,  endSec: 990, theme: "light" },
-  { id: "mondayMorning",       label: "Monday morning: 3 bets",      act: 4, startSec: 990,  endSec: 1140, theme: "light" },
+  { id: "act3Preamble",        label: "Capability staircase",        act: 3, startSec: 660,  endSec: 700, theme: "light" },
+  { id: "undergrad2031",       label: "Undergrad 2031",              act: 3, startSec: 700,  endSec: 810, theme: "light" },
+  { id: "phd2031",             label: "PhD 2031",                    act: 3, startSec: 810,  endSec: 890, theme: "light" },
+  { id: "faculty2031",         label: "Faculty 2031",                act: 3, startSec: 890,  endSec: 940, theme: "light" },
+  { id: "wordcloud",           label: "Audience word cloud",         act: 3, startSec: 940,  endSec: 970, theme: "light" },
+  { id: "mondayMorning",       label: "Monday morning: 3 bets",      act: 4, startSec: 970,  endSec: 1140, theme: "light" },
   { id: "close",               label: "Close",                       act: 4, startSec: 1140, endSec: 1200, theme: "light" },
 ];
 

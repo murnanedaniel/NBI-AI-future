@@ -21,6 +21,7 @@ import { EasterThesis } from "./scenes/EasterThesis";
 import { EasterWhyPossible } from "./scenes/EasterWhyPossible";
 import { StatsFeint } from "./scenes/StatsFeint";
 import { Matchmaking } from "./scenes/Matchmaking";
+import { Act3Preamble } from "./scenes/Act3Preamble";
 
 const SCENE_COMPONENTS: Partial<Record<SceneId, () => React.ReactElement>> = {
   title: TitleSlide,
@@ -37,6 +38,7 @@ const SCENE_COMPONENTS: Partial<Record<SceneId, () => React.ReactElement>> = {
   easter10WhyPossible: EasterWhyPossible,
   statsFeint: StatsFeint,
   matchmaking: Matchmaking,
+  act3Preamble: Act3Preamble,
 };
 
 export function Stage() {
