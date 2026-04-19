@@ -5,12 +5,13 @@ import { SCENES, TOTAL_SEC, formatMMSS } from "@/lib/timeline";
 type Props = {
   elapsed: number;
   sceneIdx: number;
+  stepIdx: number;
   total: number;
   fallback: boolean;
   running: boolean;
 };
 
-export function PresenterClock({ elapsed, sceneIdx, fallback, running }: Props) {
+export function PresenterClock({ elapsed, sceneIdx, stepIdx, fallback, running }: Props) {
   const scene = SCENES[sceneIdx];
   const expectedElapsed = scene.startSec;
   const drift = elapsed - expectedElapsed;
@@ -34,6 +35,20 @@ export function PresenterClock({ elapsed, sceneIdx, fallback, running }: Props) 
         <span className="text-zinc-600">[{sceneIdx + 1}/{SCENES.length}]</span>
       </div>
       <div className="flex items-center gap-3 mt-1">
+        <span className="text-zinc-500">step</span>
+        <span className="text-zinc-200 tabular-nums">{stepIdx + 1}/{scene.steps}</span>
+        <div className="flex items-center gap-1 flex-1 ml-1">
+          {Array.from({ length: scene.steps }).map((_, i) => (
+            <span
+              key={i}
+              className={`h-[3px] flex-1 rounded-sm ${
+                i <= stepIdx ? "bg-sky-400" : "bg-white/10"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="flex items-center gap-3 mt-1">
         <span className="text-zinc-500">budget</span>
         <span>{formatMMSS(scene.startSec)}–{formatMMSS(scene.endSec)}</span>
         <span className={driftColor}>
@@ -41,7 +56,7 @@ export function PresenterClock({ elapsed, sceneIdx, fallback, running }: Props) 
         </span>
       </div>
       <div className="mt-1 text-[10px] text-zinc-600">
-        space/→ advance · ←/⇞ back · P clock · F fallback{fallback ? " ON" : ""} · R restart
+        space/→ step · ←/⇞ back · P clock · F fallback{fallback ? " ON" : ""} · R restart
       </div>
     </div>
   );

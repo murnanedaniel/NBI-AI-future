@@ -1,6 +1,9 @@
 export type SceneId =
   | "title"
-  | "hllhc"
+  | "rateRamp"
+  | "trackingProblem"
+  | "gnnSolution"
+  | "speedJourney"
   | "easter1Release"
   | "easter2Bug"
   | "easter3SmokingGun"
@@ -28,33 +31,37 @@ export type Scene = {
   act: 1 | 2 | 3 | 4;
   startSec: number;
   endSec: number;
+  steps: number;
   theme?: Theme;
 };
 
 export const SCENES: Scene[] = [
-  { id: "title",               label: "Title",                       act: 1, startSec: 0,    endSec: 60   },
-  { id: "hllhc",               label: "HL-LHC tracking hook",        act: 1, startSec: 60,   endSec: 120  },
+  { id: "title",               label: "Title",                       act: 1, startSec: 0,    endSec: 60,   steps: 3 },
+  { id: "rateRamp",            label: "40 million per second",       act: 1, startSec: 60,   endSec: 75,   steps: 4 },
+  { id: "trackingProblem",     label: "Find tracks in hits",         act: 1, startSec: 75,   endSec: 90,   steps: 3 },
+  { id: "gnnSolution",         label: "Graphs, not transformers",    act: 1, startSec: 90,   endSec: 105,  steps: 4 },
+  { id: "speedJourney",        label: "From 30 s to 10 ms",          act: 1, startSec: 105,  endSec: 120,  steps: 3 },
 
-  { id: "easter1Release",      label: "Easter · release",            act: 2, startSec: 120,  endSec: 140  },
-  { id: "easter2Bug",          label: "Easter · bug report",         act: 2, startSec: 140,  endSec: 175  },
-  { id: "easter3SmokingGun",   label: "Easter · predict zero",       act: 2, startSec: 175,  endSec: 230  },
-  { id: "easter4CrossEval",    label: "Easter · cross-eval",         act: 2, startSec: 230,  endSec: 265  },
-  { id: "easter5Dispatch",     label: "Easter · dispatch",           act: 2, startSec: 265,  endSec: 305  },
-  { id: "easter6Architecture", label: "Easter · cross-track attn",   act: 2, startSec: 305,  endSec: 345  },
-  { id: "easter7Discovery",    label: "Easter · vertex discovery",   act: 2, startSec: 345,  endSec: 410  },
-  { id: "easter8Reveal",       label: "Easter · reveal",             act: 2, startSec: 410,  endSec: 450  },
-  { id: "easter9Thesis",       label: "Easter · meta-thesis",        act: 2, startSec: 450,  endSec: 480  },
-  { id: "easter10WhyPossible", label: "Easter · why possible",       act: 2, startSec: 480,  endSec: 510  },
+  { id: "easter1Release",      label: "Easter · release",            act: 2, startSec: 120,  endSec: 140,  steps: 1 },
+  { id: "easter2Bug",          label: "Easter · bug report",         act: 2, startSec: 140,  endSec: 175,  steps: 1 },
+  { id: "easter3SmokingGun",   label: "Easter · predict zero",       act: 2, startSec: 175,  endSec: 230,  steps: 1 },
+  { id: "easter4CrossEval",    label: "Easter · cross-eval",         act: 2, startSec: 230,  endSec: 265,  steps: 1 },
+  { id: "easter5Dispatch",     label: "Easter · dispatch",           act: 2, startSec: 265,  endSec: 305,  steps: 1 },
+  { id: "easter6Architecture", label: "Easter · cross-track attn",   act: 2, startSec: 305,  endSec: 345,  steps: 1 },
+  { id: "easter7Discovery",    label: "Easter · vertex discovery",   act: 2, startSec: 345,  endSec: 410,  steps: 1 },
+  { id: "easter8Reveal",       label: "Easter · reveal",             act: 2, startSec: 410,  endSec: 450,  steps: 1 },
+  { id: "easter9Thesis",       label: "Easter · meta-thesis",        act: 2, startSec: 450,  endSec: 480,  steps: 1 },
+  { id: "easter10WhyPossible", label: "Easter · why possible",       act: 2, startSec: 480,  endSec: 510,  steps: 1 },
 
-  { id: "statsFeint",          label: "Stats feint → collapse",      act: 3, startSec: 510,  endSec: 540  },
-  { id: "matchmaking",         label: "Live matchmaking",            act: 3, startSec: 540,  endSec: 660, theme: "light" },
-  { id: "act3Preamble",        label: "Capability staircase",        act: 3, startSec: 660,  endSec: 700, theme: "light" },
-  { id: "faculty2031Morning",  label: "Faculty 2027 · morning",      act: 3, startSec: 700,  endSec: 820, theme: "light" },
-  { id: "faculty2031Teaching", label: "Faculty 2027 · teaching",     act: 3, startSec: 820,  endSec: 940, theme: "light" },
+  { id: "statsFeint",          label: "Stats feint → collapse",      act: 3, startSec: 510,  endSec: 540,  steps: 1 },
+  { id: "matchmaking",         label: "Live matchmaking",            act: 3, startSec: 540,  endSec: 660,  steps: 1, theme: "light" },
+  { id: "act3Preamble",        label: "Capability staircase",        act: 3, startSec: 660,  endSec: 700,  steps: 1, theme: "light" },
+  { id: "faculty2031Morning",  label: "Faculty 2027 · morning",      act: 3, startSec: 700,  endSec: 820,  steps: 1, theme: "light" },
+  { id: "faculty2031Teaching", label: "Faculty 2027 · teaching",     act: 3, startSec: 820,  endSec: 940,  steps: 1, theme: "light" },
 
-  { id: "wordcloud",           label: "Audience word cloud",         act: 3, startSec: 940,  endSec: 970, theme: "light" },
-  { id: "mondayMorning",       label: "Monday morning: 3 bets",      act: 4, startSec: 970,  endSec: 1140, theme: "light" },
-  { id: "close",               label: "Close",                       act: 4, startSec: 1140, endSec: 1200, theme: "light" },
+  { id: "wordcloud",           label: "Audience word cloud",         act: 3, startSec: 940,  endSec: 970,  steps: 1, theme: "light" },
+  { id: "mondayMorning",       label: "Monday morning: 3 bets",      act: 4, startSec: 970,  endSec: 1140, steps: 1, theme: "light" },
+  { id: "close",               label: "Close",                       act: 4, startSec: 1140, endSec: 1200, steps: 1, theme: "light" },
 ];
 
 export const TOTAL_SEC = 1200;

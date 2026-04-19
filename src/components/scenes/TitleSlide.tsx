@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 
-export function TitleSlide() {
+export function TitleSlide({ step }: { step: number }) {
   return (
     <motion.div
       className="absolute inset-0 flex items-center justify-center"
@@ -24,26 +24,58 @@ export function TitleSlide() {
           </div>
 
           <div className="px-[4%]">
-            <div className="text-[14px] uppercase tracking-[0.2em] text-ink/50 mb-6">Invited Talk</div>
-            <h1 className="text-[clamp(36px,5.2vw,84px)] leading-[1.05] text-ink">
-              AI in Research
-            </h1>
-            <h2 className="text-[clamp(22px,2.8vw,44px)] leading-[1.1] mt-3 text-ink/70 italic">
-              Future perspectives
-            </h2>
+            {step >= 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
+                className="text-[14px] uppercase tracking-[0.2em] text-ink/50 mb-6"
+              >
+                Invited Talk
+              </motion.div>
+            )}
 
-            <div className="mt-12 flex items-baseline gap-4 text-[clamp(14px,1.3vw,20px)] text-ink/70">
-              <span className="text-ink">Daniel Murnane</span>
-              <span className="text-ink/40">·</span>
-              <span>Niels Bohr Institute</span>
-              <span className="text-ink/40">·</span>
-              <span>ATLAS Collaboration</span>
-            </div>
+            {step >= 1 && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
+              >
+                <h1 className="text-[clamp(36px,5.2vw,84px)] leading-[1.05] text-ink">
+                  AI in Research
+                </h1>
+                <h2 className="text-[clamp(22px,2.8vw,44px)] leading-[1.1] mt-3 text-ink/70 italic">
+                  Future perspectives
+                </h2>
+              </motion.div>
+            )}
+
+            {step >= 2 && (
+              <motion.div
+                className="mt-12 flex items-baseline gap-4 text-[clamp(14px,1.3vw,20px)] text-ink/70"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
+              >
+                <span className="text-ink">Daniel Murnane</span>
+                <span className="text-ink/40">·</span>
+                <span>Niels Bohr Institute</span>
+                <span className="text-ink/40">·</span>
+                <span>ATLAS Collaboration</span>
+              </motion.div>
+            )}
           </div>
 
           <div className="flex items-end justify-between text-[12px] text-ink/50">
             <span>Copenhagen</span>
-            <span className="italic">press <kbd className="not-italic px-1.5 py-0.5 bg-ink/10 rounded">space</kbd> to begin</span>
+            {step >= 2 ? (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { duration: 0.5 } }}
+                className="italic"
+              >
+                press <kbd className="not-italic px-1.5 py-0.5 bg-ink/10 rounded">space</kbd> to begin
+              </motion.span>
+            ) : (
+              <span className="invisible">.</span>
+            )}
           </div>
         </div>
       </div>

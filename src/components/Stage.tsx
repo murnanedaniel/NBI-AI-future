@@ -7,7 +7,10 @@ import { useKeyboard } from "@/lib/useKeyboard";
 import { useElapsed } from "@/lib/useElapsed";
 import { PresenterClock } from "./PresenterClock";
 import { TitleSlide } from "./scenes/TitleSlide";
-import { HLLHCHook } from "./scenes/HLLHCHook";
+import { RateRamp } from "./scenes/RateRamp";
+import { TrackingProblem } from "./scenes/TrackingProblem";
+import { GnnSolution } from "./scenes/GnnSolution";
+import { SpeedJourney } from "./scenes/SpeedJourney";
 import { PlaceholderScene } from "./scenes/PlaceholderScene";
 import { EasterRelease } from "./scenes/EasterRelease";
 import { EasterBug } from "./scenes/EasterBug";
@@ -25,46 +28,71 @@ import { Act3Preamble } from "./scenes/Act3Preamble";
 import { Faculty2031Morning } from "./scenes/Faculty2031Morning";
 import { Faculty2031Teaching } from "./scenes/Faculty2031Teaching";
 
-const SCENE_COMPONENTS: Partial<Record<SceneId, () => React.ReactElement>> = {
+type SceneComponent = (props: { step: number }) => React.ReactElement;
+
+const SCENE_COMPONENTS: Partial<Record<SceneId, SceneComponent>> = {
   title: TitleSlide,
-  hllhc: HLLHCHook,
-  easter1Release: EasterRelease,
-  easter2Bug: EasterBug,
-  easter3SmokingGun: EasterSmokingGun,
-  easter4CrossEval: EasterCrossEval,
-  easter5Dispatch: EasterDispatch,
-  easter6Architecture: EasterArchitecture,
-  easter7Discovery: EasterDiscovery,
-  easter8Reveal: EasterReveal,
-  easter9Thesis: EasterThesis,
-  easter10WhyPossible: EasterWhyPossible,
-  statsFeint: StatsFeint,
-  matchmaking: Matchmaking,
-  act3Preamble: Act3Preamble,
-  faculty2031Morning: Faculty2031Morning,
-  faculty2031Teaching: Faculty2031Teaching,
+  rateRamp: RateRamp,
+  trackingProblem: TrackingProblem,
+  gnnSolution: GnnSolution,
+  speedJourney: SpeedJourney,
+  easter1Release: EasterRelease as unknown as SceneComponent,
+  easter2Bug: EasterBug as unknown as SceneComponent,
+  easter3SmokingGun: EasterSmokingGun as unknown as SceneComponent,
+  easter4CrossEval: EasterCrossEval as unknown as SceneComponent,
+  easter5Dispatch: EasterDispatch as unknown as SceneComponent,
+  easter6Architecture: EasterArchitecture as unknown as SceneComponent,
+  easter7Discovery: EasterDiscovery as unknown as SceneComponent,
+  easter8Reveal: EasterReveal as unknown as SceneComponent,
+  easter9Thesis: EasterThesis as unknown as SceneComponent,
+  easter10WhyPossible: EasterWhyPossible as unknown as SceneComponent,
+  statsFeint: StatsFeint as unknown as SceneComponent,
+  matchmaking: Matchmaking as unknown as SceneComponent,
+  act3Preamble: Act3Preamble as unknown as SceneComponent,
+  faculty2031Morning: Faculty2031Morning as unknown as SceneComponent,
+  faculty2031Teaching: Faculty2031Teaching as unknown as SceneComponent,
 };
 
 export function Stage() {
-  const [idx, setIdx] = useState(0);
+  const [sceneIdx, setSceneIdx] = useState(0);
+  const [stepIdx, setStepIdx] = useState(0);
   const [clockVisible, setClockVisible] = useState(true);
   const [fallback, setFallback] = useState(false);
   const [running, setRunning] = useState(false);
 
   const { elapsed, reset } = useElapsed(running);
 
-  const scene = SCENES[idx];
+  const scene = SCENES[sceneIdx];
   const theme = scene.theme ?? "dark";
 
   const advance = useCallback(() => {
     setRunning(true);
-    setIdx((i) => Math.min(i + 1, SCENES.length - 1));
-  }, []);
+    const current = SCENES[sceneIdx];
+    if (stepIdx < current.steps - 1) {
+      setStepIdx(stepIdx + 1);
+      return;
+    }
+    if (sceneIdx < SCENES.length - 1) {
+      setSceneIdx(sceneIdx + 1);
+      setStepIdx(0);
+    }
+  }, [sceneIdx, stepIdx]);
+
   const rewind = useCallback(() => {
-    setIdx((i) => Math.max(i - 1, 0));
-  }, []);
+    if (stepIdx > 0) {
+      setStepIdx(stepIdx - 1);
+      return;
+    }
+    if (sceneIdx > 0) {
+      const prev = SCENES[sceneIdx - 1];
+      setSceneIdx(sceneIdx - 1);
+      setStepIdx(Math.max(0, prev.steps - 1));
+    }
+  }, [sceneIdx, stepIdx]);
+
   const restart = useCallback(() => {
-    setIdx(0);
+    setSceneIdx(0);
+    setStepIdx(0);
     setRunning(false);
     reset();
   }, [reset]);
@@ -79,9 +107,9 @@ export function Stage() {
 
   const rendered = useMemo(() => {
     const Comp = SCENE_COMPONENTS[scene.id];
-    if (Comp) return <Comp key={scene.id} />;
+    if (Comp) return <Comp key={scene.id} step={stepIdx} />;
     return <PlaceholderScene key={scene.id} id={scene.id} label={scene.label} act={scene.act} />;
-  }, [scene]);
+  }, [scene, stepIdx]);
 
   return (
     <motion.div
@@ -114,7 +142,8 @@ export function Stage() {
       {clockVisible && (
         <PresenterClock
           elapsed={elapsed}
-          sceneIdx={idx}
+          sceneIdx={sceneIdx}
+          stepIdx={stepIdx}
           total={SCENES.length}
           fallback={fallback}
           running={running}
