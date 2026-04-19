@@ -63,24 +63,34 @@ Global guards:
 
 ### 2. Joint-abstract generation
 
-For each selected pair, call Claude Opus 4.7 (or Sonnet 4.6 for ~5× cost savings) with:
+For each selected pair, call Claude Opus 4.7 (or Sonnet 4.6 for ~5× cost savings) with the following prompt. The constraints are load-bearing — they prevent the "sub-nJy" / "SI-traceable" rhetorical puffery observed in the proof run.
 
-> *"Write a joint-grant abstract proposing a three-year collaboration between these two NBI faculty. 150 words. Physics-realistic, grant-quality tone. Follow with: (a) a title, (b) 3 bullet-point proposed methods, (c) a one-line budget placeholder (~1.4M DKK · 3 years · 1 PhD + 1 postdoc). Also return: a `threads_a` array of 3 strings naming the research threads of person A that the abstract draws from, and `threads_b` for person B. Output JSON."*
+> *"Write a joint-grant abstract proposing a three-year collaboration between these two NBI faculty. 150 words. Physics-realistic, grant-quality tone. Follow with: (a) a title, (b) 3 bullet-point proposed methods, (c) a one-line budget placeholder (~1.4M DKK · 3 years · 1 PhD + 1 postdoc). Also return: `threads_a` and `threads_b` arrays (3 strings each) naming the research threads drawn from each person.*
+>
+> **CONSTRAINTS (load-bearing):**
+> 1. *Use ONLY facts present in the supplied profiles. Every technical claim in the abstract must trace to at least one bullet from one of the two PIs.*
+> 2. *Do NOT introduce specific numeric thresholds (fluxes, precisions, timescales, resolutions, wavelengths, sensitivities, detection limits) unless they appear verbatim in a profile bullet.*
+> 3. *Do NOT use aspirational metrology language ('SI-traceable', 'NIST-traceable', 'standard reference', 'absolute calibration') unless the phrase appears in a profile bullet.*
+> 4. *If you cannot find a plausible grounded bridge without adding ungrounded claims, return `{\"reject\": true, \"reason\": \"...\"}` instead. Honest rejection is preferable to a fabricated bridge — the talk demo samples a different pair on rejection.*
+> 5. *After the abstract, include a `traceability` array: one entry per technical claim, mapping to the source bullet as `{claim: \"...\", bullet_ref: \"A-3\"}` (person-index + bullet-number).*
+>
+> Output JSON with fields: `{title, abstract, methods, budget, threads_a, threads_b, traceability}` or `{reject, reason}`."*
 >
 > `PERSON A: { name, section, main_ideas, next_steps }`
 > `PERSON B: { name, section, main_ideas, next_steps }`
 
-Cache each call to `artifacts/corpus/abstracts/<pair_id>.json`.
+Cache each call to `artifacts/corpus/abstracts/<pair_id>.json`. Rejections are cached too; export them in a parallel `matchmaking_rejections.json` so the downstream can inspect what the model refused to force.
 
 ### 3. Export
 
-Write `matchmaking_pairs.json` per the schema. Validate:
+Write `matchmaking_pairs.json` (accepted) + `matchmaking_rejections.json` (refused bridges) per the schemas. Validate on the accepted set:
 
-- 30 entries, 10/10/10 bucket balance
-- All 60 node IDs distinct (every pair introduces 2 new faces)
-- Abstract word counts 120–180
-- No NEAR pair shares a section
-- Threads arrays non-empty
+- If rejections occurred, the accepted count may be < 30 — that's expected. If fewer than 18 pairs survive (60 % of target), regenerate the pool from the next-best candidates rather than ship a thin demo.
+- All node IDs distinct (every pair introduces 2 new faces).
+- Abstract word counts 120–180.
+- No NEAR pair shares a section.
+- Threads arrays non-empty.
+- Every `traceability` entry resolves to a valid profile bullet.
 
 ---
 

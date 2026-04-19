@@ -55,9 +55,15 @@ All gitignored. This cache contains real researcher signals; do not commit.
 
 For each faculty:
 
-- Prefer arXiv. Resolve author via arXiv export API (`http://export.arxiv.org/api/query?search_query=au:"Surname_Given"`), matching on faculty name + KU affiliation where it appears in the abstract block.
-- Take the 3 most recent submissions; prefer first-author where dates tie.
-- Fall back to Pure (`pure_page` in the faculty JSON) if arXiv yields fewer than 3. Pure "Publications" tabs expose direct PDF links.
+- Prefer arXiv. Resolve author via arXiv export API with the **exact-phrase query** `au:"First Last"` — learned from the pipeline proof that `au:Surname_Initial` pulls large consortium papers where the target is author #150/300 and not representative of their intellectual fingerprint.
+- Apply a **lead-author filter** tiered as follows when selecting the 3 papers from the matched pool, taking most recent first within each tier:
+  - **Tier A (preferred):** `author_position ≤ 3` OR `author_position ≥ (n_authors − 2)` — first or last 3 slots.
+  - **Tier B (fallback):** `author_position ≤ 5` OR `author_position ≥ (n_authors − 4)`.
+  - **Tier C (last resort):** any position.
+  - Fill the 3-paper quota from Tier A first; drop to Tier B only if Tier A yields < 3; drop to Tier C only if B still yields < 3.
+  - Large consortium papers (Euclid, ATLAS, DESI, JWST treasury surveys) where the person is deep in the author list should be filtered out at Tier A.
+- Log every accepted / rejected paper with the tier and author position — persists in `artifacts/corpus/ingest_log/<id>.json` for audit.
+- Fall back to Pure (`pure_page` in the faculty JSON) only if Tiers A+B+C on arXiv together yield fewer than 3. Pure "Publications" tabs expose direct PDF links.
 - Rate limit 1 req/sec per host.
 - Expect ~10–20 % fallback to Pure for non-arXiv-native sections (Biophysics, Climate & Geophysics).
 
