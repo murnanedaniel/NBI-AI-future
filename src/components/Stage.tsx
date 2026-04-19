@@ -28,6 +28,8 @@ import { Matchmaking } from "./scenes/Matchmaking";
 import { Act3Preamble } from "./scenes/Act3Preamble";
 import { Faculty2031Morning } from "./scenes/Faculty2031Morning";
 import { Faculty2031Teaching } from "./scenes/Faculty2031Teaching";
+import { Close3Papers } from "./scenes/Close3Papers";
+import { CloseQuestion } from "./scenes/CloseQuestion";
 
 type SceneComponent = (props: { step: number }) => React.ReactElement;
 
@@ -53,6 +55,8 @@ const SCENE_COMPONENTS: Partial<Record<SceneId, SceneComponent>> = {
   act3Preamble: Act3Preamble as unknown as SceneComponent,
   faculty2031Morning: Faculty2031Morning as unknown as SceneComponent,
   faculty2031Teaching: Faculty2031Teaching as unknown as SceneComponent,
+  close3Papers: Close3Papers,
+  closeQuestion: CloseQuestion,
 };
 
 export function Stage() {

@@ -22,7 +22,8 @@ export type SceneId =
   | "faculty2031Teaching"
   | "wordcloud"
   | "mondayMorning"
-  | "close";
+  | "close3Papers"
+  | "closeQuestion";
 
 export type Theme = "dark" | "light";
 
@@ -64,7 +65,9 @@ export const SCENES: Scene[] = [
 
   { id: "wordcloud",           label: "Audience word cloud",         act: 3, startSec: 940, endSec: 970,  steps: 1, theme: "light" },
   { id: "mondayMorning",       label: "Monday morning: 3 bets",      act: 4, startSec: 970, endSec: 1140, steps: 1, theme: "light" },
-  { id: "close",               label: "Close",                       act: 4, startSec: 1140, endSec: 1200, steps: 1, theme: "light" },
+
+  { id: "close3Papers",        label: "Close · next 3 papers",       act: 4, startSec: 1140, endSec: 1180, steps: 3, theme: "light" },
+  { id: "closeQuestion",       label: "Close · Claude's question",   act: 4, startSec: 1180, endSec: 1200, steps: 2, theme: "light" },
 ];
 
 export const TOTAL_SEC = 1200;
