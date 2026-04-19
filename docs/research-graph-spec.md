@@ -129,8 +129,13 @@ Persist final text as `background_text` on the node.
   - **Tier C:** any position (last resort).
 - Keep the 3 most recent papers passing Tier A; fall through to B, then C.
 - **Patch 4 — Pure fallback with real abstracts.** If Tiers A+B+C on arXiv yield < 3, fall back to Pure at `researchprofiles.ku.dk` (URL is in `pure_page` on the faculty JSON). Do not stop at publication titles — fetch the individual publication pages (`/en/publications/<uuid>`) and scrape the abstract field. These are the canonical publication records for NBI staff, including geoscience/biophysics/etc. faculty who publish primarily in non-arXiv journals. Rate limit 1 req/sec. Skip publications older than 3 years (we want *recent* work). Keep up to 10 for the background step, and up to 3 for the ongoing-work step (Pure doesn't expose full PDFs reliably, so for these people the ongoing_text is built from abstracts rather than full papers — log the shallower treatment in the node).
-- Download PDFs from arXiv PDFs where available, extract text via `pdftotext`, parse abstract + intro + conclusion sections (same as `matchmaking-example-2` pipeline).
-- Persist ingest log at `artifacts/corpus/<id>/ingest_log.json`, including the source (`arxiv_tier_A` / `arxiv_tier_B` / `arxiv_tier_C` / `pure_abstract`) per paper.
+- **Patch 5 — HTML-first fetch.** For each selected paper, try the native arXiv HTML endpoint **before** the PDF:
+  1. `GET https://arxiv.org/html/<id>` (or `<id>v<N>` if the specific version is needed).
+  2. HTTP 200 → parse the HTML. Section markers are already semantic (`<section>`, `<h1>`/`<h2>` with titles like *"I Introduction"*, *"VII Conclusions"*). Equations preserved as MathML. Extract abstract + intro + conclusion from the tagged tree — no regex on pdftotext dumps.
+  3. HTTP 404 or unrenderable → fall back to the PDF path: download PDF, run `pdftotext`, regex-extract sections as before.
+  4. Log the source per paper in the ingest log (`html_native` / `pdf_pdftotext`). Expect ~80–90% coverage on 2024+ papers; near-zero on pre-2020 papers. Coverage should be logged per-run so we can track arXiv's HTML rollout.
+  Payload size: HTML is typically 250–500 KB vs PDFs at 3–17 MB — a 10–40× reduction in transfer + parse time.
+- Persist ingest log at `artifacts/corpus/<id>/ingest_log.json`, including the source (`arxiv_tier_A` / `arxiv_tier_B` / `arxiv_tier_C` / `pure_abstract`) and fetch method (`html_native` / `pdf_pdftotext`) per paper.
 
 ### 4. Ongoing-work extraction: four explicit categories
 
