@@ -1,20 +1,29 @@
-# NBI Research Graph — task spec
+# NBI Research Graph — task spec (v2)
 
-Build a graph representation of the NBI institute's intellectual landscape: faculty as nodes, similarity-of-research as edges, backed by embeddings derived from full-text recent papers. This is a **general-purpose artifact** — downstream uses include (but are not limited to) the `matchmaking-pairs-spec.md` pipeline, a potential D3/force-directed visualisation scene in the talk, and future NBI strategic analyses.
+Build a faculty intellectual landscape with **two complementary embeddings per person**:
 
-This is a one-shot offline pipeline. Dispatch a capable agent (Claude Code or similar) with this file as the brief.
+- **P — background profile.** Where they've been for years. Derived from their ~10 most recent arXiv abstracts, compressed into 5–8 distinguishing sentences.
+- **W — ongoing work.** What they're converging on now. Derived from full-text reading of their 3 most recent lead-author papers, extracting (1) stated next steps, (2) surprising findings, (3) open questions, (4) tools they built.
+
+This two-vector representation enables the matchmaking criterion that makes interdisciplinary collaborations real: *close W, distant P* — people converging on the same frontier from different starting points. See `matchmaking-pairs-spec.md`.
+
+The graph is also a **general-purpose artifact**. Downstream uses:
+- `matchmaking-pairs-spec.md` — selects 45 group-pair collaboration abstracts.
+- Talk scene `researchGraph` — UMAP-rendered NBI landscape with W-bridges crossing section clusters, as the opening beat of Act 3.
+- Standalone `/graph` page — interactive version for NBI to browse after the talk.
+- Future NBI strategic analyses.
+
+One-shot offline pipeline. Dispatch with this file as the brief.
 
 ---
 
 ## Inputs
 
-- `/home/murnanedaniel/Research/conferences/faculty_retreat/artifacts/nbi_faculty.json` — 124 NBI faculty (assistant professor and above). Per entry: `display_name`, `title`, `rank_normalized`, `section`, `unit`, `email`, `pure_page`, `personal_page`, `recent_publication_titles` (≤5), `research_keywords`, `research_blurb`.
+- `/home/murnanedaniel/Research/conferences/faculty_retreat/artifacts/nbi_faculty.json` — 124 NBI faculty (asst prof and above).
 
 ## Outputs
 
-Write to:
-
-- `/home/murnanedaniel/Research/conferences/faculty_retreat/artifacts/nbi_research_graph.json`
+`/home/murnanedaniel/Research/conferences/faculty_retreat/artifacts/nbi_research_graph.json`
 
 Schema:
 
@@ -25,106 +34,129 @@ Schema:
   "summariser_model": "claude-sonnet-4-6",
   "nodes": [
     {
-      "id": "143217",
-      "name": "Andersen, Anja C.",
-      "section": "Astrophysics and Planetary Science",
+      "id": "5469",
+      "name": "Sune Toft",
+      "section": "Cosmic Dawn Center (DAWN)",
       "rank": "professor",
-      "main_ideas": ["…", "…"],
-      "next_steps": ["…", "…"],
-      "embedding": [/* 3072 floats */],
-      "source_text": "NAME · SECTION · RANK\n\nRecent research:\n- …\n\nStated next steps:\n- …"
+      "background_text": "5–8 distinguishing sentences …",
+      "ongoing_text": "explicit points · stated next steps … · surprising findings … · open questions … · tools …",
+      "p_vec": [/* 3072 floats */],
+      "w_vec": [/* 3072 floats */],
+      "coords_2d": [2.34, -1.87]
     }
   ],
-  "edges": [
-    { "a": "143217", "b": "…", "cosine_distance": 0.37 }
-  ]
+  "edges_p": [{ "a": "5469", "b": "…", "cosine_similarity": 0.81 }],
+  "edges_w": [{ "a": "5469", "b": "…", "cosine_similarity": 0.62 }],
+  "coauthored": [{ "a": "5469", "b": "…" }]
 }
 ```
 
-Per-faculty working files under `artifacts/corpus/`:
-- `papers/<id>/paper_<i>.pdf` — raw PDFs
-- `summaries/<id>.json` — aggregated main ideas + next steps
-
-All gitignored. This cache contains real researcher signals; do not commit.
+Per-faculty working cache under `artifacts/corpus/<id>/` — gitignored. Keep `background_candidates/` (10 abstract excerpts), `papers/` (3 full PDFs), `ongoing_extracts/` (structured bullet set per paper), `profile.json` (aggregated per-person), `authors.json` (paper author lists for the co-author step).
 
 ---
 
 ## Pipeline
 
-### 1. Paper ingest (full text, top 3 per person)
+### 1. Background corpus: latest ~10 arXiv abstracts per person
 
-For each faculty:
+- Query arXiv with exact-phrase `au:"First Last"` (never `au:Surname_Initial` — that fires on Euclid/ATLAS consortium papers where the target is author #150 / 300).
+- Keep the 10 most recent, regardless of author position (background is inclusive).
+- Store the raw abstracts in `artifacts/corpus/<id>/background_candidates/`.
 
-- Prefer arXiv. Resolve author via arXiv export API with the **exact-phrase query** `au:"First Last"` — learned from the pipeline proof that `au:Surname_Initial` pulls large consortium papers where the target is author #150/300 and not representative of their intellectual fingerprint.
-- Apply a **lead-author filter** tiered as follows when selecting the 3 papers from the matched pool, taking most recent first within each tier:
-  - **Tier A (preferred):** `author_position ≤ 3` OR `author_position ≥ (n_authors − 2)` — first or last 3 slots.
-  - **Tier B (fallback):** `author_position ≤ 5` OR `author_position ≥ (n_authors − 4)`.
-  - **Tier C (last resort):** any position.
-  - Fill the 3-paper quota from Tier A first; drop to Tier B only if Tier A yields < 3; drop to Tier C only if B still yields < 3.
-  - Large consortium papers (Euclid, ATLAS, DESI, JWST treasury surveys) where the person is deep in the author list should be filtered out at Tier A.
-- Log every accepted / rejected paper with the tier and author position — persists in `artifacts/corpus/ingest_log/<id>.json` for audit.
-- Fall back to Pure (`pure_page` in the faculty JSON) only if Tiers A+B+C on arXiv together yield fewer than 3. Pure "Publications" tabs expose direct PDF links.
-- Rate limit 1 req/sec per host.
-- Expect ~10–20 % fallback to Pure for non-arXiv-native sections (Biophysics, Climate & Geophysics).
+### 2. Background synthesis: 5–8 distinguishing sentences
 
-### 2. Per-paper summarisation
+Prompt Sonnet 4.6 (first pass):
 
-For each downloaded PDF:
+> *"Read these 10 recent arXiv abstracts from <Name> (<Section>). Write 5–8 sentences describing their research background. Each sentence must be specific enough to distinguish them from the section average — avoid generic phrases like 'studies the early universe' or 'works on machine learning.' Mention concrete tools, methods, systems, or questions that appear repeatedly across the abstracts."*
 
-- Parse to text (`pdftotext`, `pypdf`).
-- Send abstract + introduction + conclusion sections (cap ~12k tokens) to Claude Sonnet 4.6 with prompt:
-  > *"From this paper, extract (a) 3 bullets summarising the main scientific ideas, (b) 2 bullets capturing the stated or implied next steps. Output JSON: `{main_ideas: string[], next_steps: string[]}`."*
-- Cache to `artifacts/corpus/summaries/<id>/paper_<i>.json`.
+Then a specificity-check pass (Sonnet, cheap):
 
-Aggregate per faculty: union across 3 papers, dedupe near-identical bullets (cosine similarity > 0.92 on bullet embeddings), keep ≤ 6 main ideas and ≤ 4 next steps.
+> *"Flag any sentence that could appear verbatim in the background of any other researcher in <Section>. Rewrite those to name specific methods, systems, or questions from the abstracts."*
 
-### 3. Faculty-level embedding
+Persist final text as `background_text` on the node.
 
-Compose a per-faculty document:
+### 3. Ongoing-work corpus: 3 lead-author papers full text
 
-```
-NAME · SECTION · RANK
+- Query arXiv with exact-phrase `au:"First Last"`, then apply the tiered lead-author filter:
+  - **Tier A:** `author_position ≤ 3` OR `author_position ≥ (n_authors − 2)`
+  - **Tier B:** `author_position ≤ 5` OR `author_position ≥ (n_authors − 4)`
+  - **Tier C:** any position (last resort).
+- Keep the 3 most recent papers passing Tier A; fall through to B, then C.
+- Fall back to Pure only if Tiers A+B+C on arXiv yield < 3.
+- Download PDFs, extract text via `pdftotext`, parse abstract + intro + conclusion sections (same as `matchmaking-example-2` pipeline).
+- Persist ingest log at `artifacts/corpus/<id>/ingest_log.json`.
 
-Recent research:
-- <main_idea_1>
-- …
+### 4. Ongoing-work extraction: four explicit categories
 
-Stated next steps:
-- <next_step_1>
-- …
-```
+For each paper, prompt Sonnet 4.6:
 
-Embed with `text-embedding-3-large` (3072-dim). Store in the node record.
+> *"From this paper, extract up to 4 items in each of these categories, as specific short bullets:*
+> *— `next_steps`: next investigations the authors explicitly state they will undertake.*
+> *— `surprising_findings`: results the authors flag as unexpected or in tension with prior expectation.*
+> *— `open_questions`: things the authors explicitly say they don't yet understand.*
+> *— `tools_built`: new methods, code frameworks, datasets, instruments, or benchmarks the authors built in this paper.*
+> *Output JSON with these four arrays; fewer items per category is fine if the paper doesn't support more."*
 
-### 4. Edge weights
+Aggregate per person across 3 papers; dedup near-identical bullets (cosine similarity > 0.92 on bullet embeddings).
 
-Compute cosine distance for all C(124, 2) = **7,626 pairs**. Include every pair in the `edges` array, sorted by distance ascending. Downstream consumers can threshold as they see fit.
+### 5. Ongoing-work description: one paragraph per person
 
-### 5. Export
+Prompt Sonnet 4.6:
 
-Write `nbi_research_graph.json` per the schema above. Validate:
+> *"Here are <Name>'s extracted next_steps, surprising_findings, open_questions, and tools_built across their 3 most recent lead-author papers. Write a single paragraph (≤ 120 words) describing their current frontier — what they're about to do next, what puzzles they're chasing, what they just built. Be specific. Avoid general framing about the field."*
 
-- 124 nodes, 7,626 edges, no missing embeddings
-- Mean bullet count per node ≥ 3
-- Re-load and spot-check 5 random nodes for summary quality
+Persist as `ongoing_text`.
+
+### 6. Embeddings
+
+- `p_vec` = `text-embedding-3-large(background_text)`.
+- `w_vec` = `text-embedding-3-large(ongoing_text)`.
+- Both 3072-dim.
+
+### 7. Pairwise similarity matrices
+
+- `edges_p` = cosine similarity across all C(124, 2) = 7,626 pairs, in P.
+- `edges_w` = same pairs, in W.
+
+Keep all edges (not just top-k) — downstream filters decide thresholds.
+
+### 8. Co-authorship adjacency
+
+For each paper fetched at steps 1 and 3, persist the full author list to `authors.json` per faculty. Build a cross-faculty adjacency:
+
+- Primary: name-match across author lists. Two faculty co-authored iff at least one fetched paper lists both.
+- Normalize names (remove middle initials, lowercase, strip accents) for matching.
+- Output `coauthored` as a list of unordered pairs.
+
+This catches explicit collaborators. It won't catch pairs who co-authored a paper outside the 13 fetched per person — but those are rare enough that a single false negative in 7,626 pairs is acceptable. Optional upgrade: one additional arXiv query per candidate pair flagged by the matchmaking filter.
+
+### 9. 2D layout for visualisation
+
+Run UMAP (`n_neighbors=15, min_dist=0.3, metric='cosine', n_components=2`) on the stack of 124 `p_vec`s. Persist per-node `coords_2d`.
+
+Section clusters should be visibly separated in the 2D space (by construction — same-section researchers have similar P). If they're not, tune UMAP hyperparameters and document the choice.
+
+### 10. Export
+
+Write `nbi_research_graph.json`. Validate:
+
+- 124 nodes. No missing embeddings.
+- 7,626 edges in each of `edges_p` and `edges_w`.
+- Mean bullet count per node ≥ 3 in each ongoing category.
+- 2D coords in reasonable range (no NaN, no point > 20 units from origin).
+- Spot-check: at least 5 same-section pairs have P-similarity > 0.7; at least 5 cross-section pairs have P-similarity < 0.3. Empirical sanity check.
 
 ---
 
 ## Constraints
 
-- **Budget:** ≤ $10 total API spend (most of the cost is in step 2).
-- **Wall time:** ≤ 3 hours on a laptop with normal connection.
-- **Privacy:** all output gitignored.
-- **Reproducible:** save the summariser prompt text alongside the graph, so downstream re-runs can detect spec drift.
+- **Budget:** ≤ $15 API spend (expectation: ~$5 summaries + ~$1 embeddings; headroom for retries).
+- **Wall time:** ≤ 5 hours.
+- **Privacy:** output gitignored. Public exposure gated by per-faculty opt-in downstream.
+- **Reproducible:** persist all prompts alongside the graph so spec drift is detectable on re-runs.
 
 ## Downstream consumers (not in scope here)
 
-- `matchmaking-pairs-spec.md` — selects 30 stratified pairs and generates joint-grant abstracts.
-- Potential talk visualisation: render the graph as a force-directed D3/WebGL scene (nodes coloured by section, edge opacity by similarity). Would be a cool Act 3 visual if Daniel wants it.
-- Future NBI strategic analyses.
-
-## Out of scope
-
-- Pair selection, abstract generation (see `matchmaking-pairs-spec.md`).
-- Visualisation (belongs in the talk app, not the pipeline).
-- Opt-in filtering for public sharing (downstream).
+- `matchmaking-pairs-spec.md` — group-pair matches via threshold-AND-ranked W/P selection.
+- Talk scene `researchGraph` — renders `coords_2d` + `edges_w` with section-coloured nodes and bright cross-section W-bridge edges. Proposed position: first beat of Act 3 matchmaking, before the audience prompt.
+- Standalone `/graph` page in the stage app — same data, interactive (pan, zoom, hover a node to see their background + ongoing profiles, click an edge to see the joint abstract if one exists).
