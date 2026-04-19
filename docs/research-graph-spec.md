@@ -57,6 +57,31 @@ Per-faculty working cache under `artifacts/corpus/<id>/` — gitignored. Keep `b
 
 ## Pipeline
 
+### 0. Shared per-faculty cache (cross-run)
+
+Canonical path: **`/home/murnanedaniel/Research/conferences/faculty_retreat/artifacts/corpus/<faculty_id>/`**. This path is shared across every invocation of the pipeline — pilots, full runs, selective re-runs. Expensive operations (arXiv fetches, PDF downloads, Claude summary calls, OpenAI embedding calls) cache their output here and **skip on re-invocation if the cache file is non-empty**.
+
+Layout under `corpus/<id>/`:
+
+```
+background_candidates.json   # step 1 output: the 10 abstracts + metadata
+background_text.json         # step 2 output: {text, model, timestamp}
+papers.json                  # step 3 output: arXiv matches + tier log
+papers/paper_{1,2,3}.pdf     # step 3 output: downloaded PDFs
+papers/paper_{1,2,3}.txt     # step 3 output: pdftotext dump
+papers/paper_{1,2,3}_extracted.json  # step 3 output: abstract+intro+conclusion
+summaries/paper_{1,2,3}.json # step 4 output: per-paper bullet extraction
+ongoing_text.json            # step 5 output: aggregated ongoing paragraph
+embedding.json               # step 6 output: {p_vec, w_vec, model, dims}
+authors.json                 # step 8 input: union of author names from all fetched papers
+```
+
+**Cache-hit rule:** each step checks for the presence of its own output files at the start; if every file the step would produce already exists and is non-empty, the step skips and logs `cache_hit: <id>`. If only some exist (partial failure in a prior run), the step reprocesses the missing pieces only.
+
+**Cache invalidation:** manual — delete the file(s) to force reprocessing. Optional soft version key on each file: if the agent's code version (git SHA) differs from the `produced_by_commit` recorded in the file, log a warning but still use the cache (unless `--force` flag). Spec-level prompt changes require deleting the corresponding cache files (`background_text.json`, `summaries/*.json`, etc.) across all faculty.
+
+**Graph output paths are separate and NOT cached** — `nbi_research_graph.json` is rebuilt from the per-faculty cache on every run. Different runs can produce to different output paths (e.g., `artifacts/pilot/…`, `artifacts/pilot-v3/…`, `artifacts/nbi_research_graph.json`) without interfering with each other.
+
 ### 1. Background corpus: latest ~10 arXiv abstracts per person
 
 - Query arXiv with exact-phrase `au:"First Last"` (never `au:Surname_Initial` — that fires on Euclid/ATLAS consortium papers where the target is author #150 / 300).
