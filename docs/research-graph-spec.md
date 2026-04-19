@@ -71,7 +71,7 @@ Per-faculty working cache under `artifacts/corpus/<id>/` — gitignored. Keep `b
   "Theoretical Particle Physics and Cosmology": ["hep-th", "hep-ph", "gr-qc", "astro-ph.CO", "astro-ph.HE"],
   "Experimental Subatomic Physics":          ["hep-ex", "nucl-ex", "hep-ph", "physics.ins-det", "physics.acc-ph"],
   "Quantum Optics":                          ["quant-ph", "physics.optics", "physics.atom-ph", "cond-mat.mes-hall", "cond-mat.quant-gas"],
-  "Condensed Matter Physics":                ["cond-mat.mes-hall", "cond-mat.str-el", "cond-mat.supr-con", "cond-mat.quant-gas", "cond-mat.stat-mech", "cond-mat.soft", "cond-mat.dis-nn", "cond-mat.mtrl-sci"],
+  "Condensed Matter Physics":                ["cond-mat.mes-hall", "cond-mat.str-el", "cond-mat.supr-con", "cond-mat.quant-gas", "cond-mat.stat-mech", "cond-mat.soft", "cond-mat.dis-nn", "cond-mat.mtrl-sci", "quant-ph"],
   "Biophysics":                              ["physics.bio-ph", "cond-mat.soft", "q-bio.BM", "q-bio.CB", "q-bio.SC", "q-bio.PE", "q-bio.TO", "q-bio.QM"],
   "Climate and Geophysics":                  ["physics.geo-ph", "physics.ao-ph", "physics.flu-dyn", "physics.ocean-ph"]
 }
