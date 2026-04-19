@@ -123,6 +123,7 @@ Persist final text as `background_text` on the node.
 ### 3. Ongoing-work corpus: 3 lead-author papers full text
 
 - Query arXiv with exact-phrase `au:"First Last"` AND the section-category filter from step 1 (Patch 3 applies here too — otherwise the lead-author filter can still latch onto the wrong human if they happen to be a first-author ML paper).
+- **Patch 6 — Unicode-tolerant author matching.** Normalise both the faculty query name and every arXiv-returned author name with `unicodedata.normalize("NFKD", s)` + strip combining chars before comparing. Without this, any faculty whose surname contains diacritics (Vaitiek**ė**nas, M**ü**ller, Fl**ø**e, Damg**å**ard, et al.) gets `author_position = None` on 80–90 % of candidates because arXiv stores the character but the query string is ASCII — silent fall-through past Tier A onto stale older papers. Apply NFKD normalisation inside `author_position()` and inside the co-author adjacency name-match.
 - Apply the tiered lead-author filter:
   - **Tier A:** `author_position ≤ 3` OR `author_position ≥ (n_authors − 2)`
   - **Tier B:** `author_position ≤ 5` OR `author_position ≥ (n_authors − 4)`
