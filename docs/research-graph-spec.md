@@ -78,6 +78,14 @@ authors.json                 # step 8 input: union of author names from all fetc
 
 **Cache-hit rule:** each step checks for the presence of its own output files at the start; if every file the step would produce already exists and is non-empty, the step skips and logs `cache_hit: <id>`. If only some exist (partial failure in a prior run), the step reprocesses the missing pieces only.
 
+**Shallow-cache upgrade rule (Patch 8 + Patch 4 interaction).** Cache hit is not the same as "cached data is as good as what the current pipeline can produce." When a cached entry carries a *shallow* marker, the step MUST refresh rather than cache-hit:
+
+- Per-publication ingest records with `abstract_source == "title_only"` → always retry the abstract-chain. Patch 8's newer fallbacks (INSPIRE-HEP, OpenAlex, Crossref) may now succeed where prior runs produced only a title.
+- Per-faculty node with `selection_tier == "title_only_no_abstracts_found"` or `manual_review: true` → always retry steps 3–5 from scratch.
+- Ingest entries with `fetch_method == "pdf_pdftotext"` when Patch 5 is active and `arxiv.org/html/<id>` now exists → optional refresh (semantic content is the same; the benefit is better section extraction, not more info). Skip by default; `--refresh-html` flag forces it.
+
+Summarise the rule: **never silently preserve a shallower cached artifact than the current spec can produce for the same input.** The ingest step and the synthesis steps both check the shallow-markers on cache lookup before declaring a hit.
+
 **Cache invalidation:** manual — delete the file(s) to force reprocessing. Optional soft version key on each file: if the agent's code version (git SHA) differs from the `produced_by_commit` recorded in the file, log a warning but still use the cache (unless `--force` flag). Spec-level prompt changes require deleting the corresponding cache files (`background_text.json`, `summaries/*.json`, etc.) across all faculty.
 
 **Graph output paths are separate and NOT cached** — `nbi_research_graph.json` is rebuilt from the per-faculty cache on every run. Different runs can produce to different output paths (e.g., `artifacts/pilot/…`, `artifacts/pilot-v3/…`, `artifacts/nbi_research_graph.json`) without interfering with each other.
@@ -148,6 +156,11 @@ Persist final text as `background_text` on the node.
 - Persist ingest log at `artifacts/corpus/<id>/ingest_log.json`, including the source (`arxiv_tier_A` / `arxiv_tier_B` / `arxiv_tier_C` / `pure_abstract`) and fetch method (`html_native` / `pdf_pdftotext`) per paper.
 
 ### 4. Ongoing-work extraction: four explicit categories
+
+**Patch 7 — Sonnet concurrency + 429 backoff.** Pilot v4 at `max_concurrent_sonnet=3` tripped the 30k input-TPM org-level rate limit on 7/30 payloads in this step. Two fixes applied together:
+
+- Pin `max_concurrent_sonnet = 2` for the extraction step. Negligible wall-time impact (Sonnet was already serialising per-paper waits on TPM).
+- Wrap every Sonnet call in an exponential-backoff retry: on HTTP 429 or `rate_limit_error`, sleep `min(60, 2 ** attempt + random.uniform(0, 1))` seconds, retry up to 5 times. Log the backoff depth in the ingest log so we can audit.
 
 For each paper, prompt Sonnet 4.6:
 
