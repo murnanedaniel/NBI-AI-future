@@ -17,6 +17,18 @@ One-shot offline pipeline. Dispatch with this file as the brief.
 
 ---
 
+## Pipeline architecture — three phases
+
+The pipeline runs in three distinct phases with different billing and parallelism profiles. This split is deliberate: LLM calls from standalone Python scripts are per-token billed via the Anthropic API; LLM calls from subagents dispatched inside Claude Code inherit the flat-rate subscription billing. To minimise per-token spend, script phases do only I/O and subagent phases do all LLM work.
+
+- **Phase A — Scraping** (single script via Agent tool). Pure I/O: arXiv queries, PDF/HTML fetches, Pure fallback, Patch 8 chain (INSPIRE-HEP/OpenAlex/Crossref), Patch 9 strict-collaboration filter. All raw responses persist under `artifacts/corpus/<id>/raw/`. Cost: $0 API.
+- **Phase B — LLM work** (~10 parallel subagents from within Claude Code). Each subagent reads raw, synthesises background + ongoing paragraphs + extracts the four categories. Writes to canonical cache. Cost: subscription-billed.
+- **Phase C — Embedding + graph export** (single script via Agent tool). OpenAI `text-embedding-3-large` on P and W per faculty, pairwise similarity, co-author adjacency, UMAP 2D, JSON export. Cost: ~$0.50 OpenAI.
+
+The existing step-by-step sections below remain the detailed sub-procedures. Phase A owns steps 0 (cache), 1 (background scrape), 3 (ongoing scrape). Phase B owns steps 2 (background synthesis), 4 (ongoing extraction), 5 (ongoing synthesis). Phase C owns steps 6 (embed), 7 (pairwise), 8 (co-author), 9 (UMAP), 10 (export).
+
+---
+
 ## Inputs
 
 - `/home/murnanedaniel/Research/conferences/faculty_retreat/artifacts/nbi_faculty.json` — 124 NBI faculty (asst prof and above).
@@ -147,6 +159,30 @@ Persist final text as `background_text` on the node.
   5. **Dead-end:** if every tier misses, mark the publication as `abstract_source: "title_only"` and **exclude it from the ongoing corpus** (do not let it contaminate `main_ideas` / `next_steps`). If this leaves the faculty with fewer than 2 sources, set `selection_tier: "title_only_no_abstracts_found"` and `manual_review: true` on the node; have the ongoing-paragraph synthesiser emit a placeholder string like `"[manual review required — no abstracts available for this faculty member]"` rather than fluent prose.
 
   Persist per-publication `abstract_source ∈ {"arxiv_fulltext", "pure_page", "inspire_hep", "openalex", "crossref", "title_only"}` in the ingest log so the coverage ladder is auditable. Total extra cost at N=124 scale: INSPIRE-HEP + OpenAlex are free; Crossref is free. Adds ≤ 3 s wall per Pure-fallback paper.
+
+- **Patch 9 — Strict collaboration filter on Patch 8 responses.** Pilot v5 confirmed that INSPIRE-HEP and OpenAlex cheerfully return full abstracts for 3000-author ATLAS collaboration papers. Those abstracts are real text but describe collaboration work, not the target faculty's individual intellectual fingerprint. Apply this filter to **every** Patch 8 tier response:
+
+  1. Parse author list: INSPIRE-HEP → `metadata.authors[].full_name`; OpenAlex → `authorships[].author.display_name`; Crossref → `message.author[].{given, family}`.
+  2. NFKD-normalise, lowercase, strip combining chars (Patch 6 normaliser). Find target position by surname match on the normalised strings.
+  3. **Reject the response if `n_authors > 20` AND target position is not in `[1, 5] ∪ [n_authors - 4, n_authors]`.** Fall through to the next tier.
+
+  If all chain tiers reject: persist **title only** (do not embed a consortium abstract under the target's name). Ingest record:
+
+  ```json
+  {
+    "abstract_source": "title_only",
+    "collaboration_filtered": true,
+    "n_authors": 3247,
+    "target_position": 417,
+    "title": "..."
+  }
+  ```
+
+  Node-level flag: when ≥ 2 of the faculty's ongoing publications are `collaboration_filtered`, mark the node `manual_review: true`. Phase B synthesiser detects this flag and uses a **constrained prompt** that names the collaborations and topics from titles without fabricating personal next steps:
+
+  > *"{Name}'s recent public output is {N} collaboration papers in {inferred experiment / survey names from titles}, focused on {topics aggregated from titles}. Individual intellectual fingerprint not attributable from public record."*
+
+  Priority order across the whole chain: full abstracts > personal-contribution titles > nothing. Never silently confabulate a collaboration paper's abstract as though it described the individual.
 - **Patch 5 — HTML-first fetch.** For each selected paper, try the native arXiv HTML endpoint **before** the PDF:
   1. `GET https://arxiv.org/html/<id>` (or `<id>v<N>` if the specific version is needed).
   2. HTTP 200 → parse the HTML. Section markers are already semantic (`<section>`, `<h1>`/`<h2>` with titles like *"I Introduction"*, *"VII Conclusions"*). Equations preserved as MathML. Extract abstract + intro + conclusion from the tagged tree — no regex on pdftotext dumps.
