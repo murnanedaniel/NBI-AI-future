@@ -60,8 +60,28 @@ Per-faculty working cache under `artifacts/corpus/<id>/` — gitignored. Keep `b
 ### 1. Background corpus: latest ~10 arXiv abstracts per person
 
 - Query arXiv with exact-phrase `au:"First Last"` (never `au:Surname_Initial` — that fires on Euclid/ATLAS consortium papers where the target is author #150 / 300).
-- Keep the 10 most recent, regardless of author position (background is inclusive).
-- Store the raw abstracts in `artifacts/corpus/<id>/background_candidates/`.
+- **Patch 3 — name-collision defence.** Restrict every arXiv query to the categories appropriate for the faculty member's section. Without this, common surnames (`"Gang Chen"`, `"Jörg Müller"`) pull ML/robotics papers from unrelated researchers. Section → categories mapping:
+
+```json
+{
+  "Cosmic Dawn Center (DAWN)":               ["astro-ph.CO", "astro-ph.GA", "astro-ph.HE", "astro-ph.IM", "astro-ph.SR", "gr-qc"],
+  "Dark Cosmology Centre (DARK)":            ["astro-ph.CO", "astro-ph.GA", "astro-ph.HE", "gr-qc", "hep-ph"],
+  "Astrophysics and Planetary Science":      ["astro-ph.EP", "astro-ph.GA", "astro-ph.HE", "astro-ph.IM", "astro-ph.SR", "physics.space-ph"],
+  "Niels Bohr International Academy":        ["astro-ph.CO", "astro-ph.HE", "gr-qc", "hep-th", "hep-ph", "cond-mat.stat-mech", "quant-ph"],
+  "Theoretical Particle Physics and Cosmology": ["hep-th", "hep-ph", "gr-qc", "astro-ph.CO", "astro-ph.HE"],
+  "Experimental Subatomic Physics":          ["hep-ex", "nucl-ex", "hep-ph", "physics.ins-det", "physics.acc-ph"],
+  "Quantum Optics":                          ["quant-ph", "physics.optics", "physics.atom-ph", "cond-mat.mes-hall", "cond-mat.quant-gas"],
+  "Condensed Matter Physics":                ["cond-mat.mes-hall", "cond-mat.str-el", "cond-mat.supr-con", "cond-mat.quant-gas", "cond-mat.stat-mech", "cond-mat.soft", "cond-mat.dis-nn", "cond-mat.mtrl-sci"],
+  "Biophysics":                              ["physics.bio-ph", "cond-mat.soft", "q-bio.BM", "q-bio.CB", "q-bio.SC", "q-bio.PE", "q-bio.TO", "q-bio.QM"],
+  "Climate and Geophysics":                  ["physics.geo-ph", "physics.ao-ph", "physics.flu-dyn", "physics.ocean-ph"]
+}
+```
+
+Full arXiv query takes the form `au:"First Last" AND (cat:<c1> OR cat:<c2> OR ...)`. Categories should be OR-joined in the query.
+
+- Keep the 10 most recent abstracts that pass the category filter, regardless of author position (background is inclusive on author position; strict on subject).
+- If fewer than 5 candidates survive the category filter (the faculty may publish in an unlisted category), log the shortfall, then retry with no category filter but flag the person for manual review in the final report.
+- Store raw abstracts in `artifacts/corpus/<id>/background_candidates/`.
 
 ### 2. Background synthesis: 5–8 distinguishing sentences
 
@@ -77,14 +97,15 @@ Persist final text as `background_text` on the node.
 
 ### 3. Ongoing-work corpus: 3 lead-author papers full text
 
-- Query arXiv with exact-phrase `au:"First Last"`, then apply the tiered lead-author filter:
+- Query arXiv with exact-phrase `au:"First Last"` AND the section-category filter from step 1 (Patch 3 applies here too — otherwise the lead-author filter can still latch onto the wrong human if they happen to be a first-author ML paper).
+- Apply the tiered lead-author filter:
   - **Tier A:** `author_position ≤ 3` OR `author_position ≥ (n_authors − 2)`
   - **Tier B:** `author_position ≤ 5` OR `author_position ≥ (n_authors − 4)`
   - **Tier C:** any position (last resort).
 - Keep the 3 most recent papers passing Tier A; fall through to B, then C.
-- Fall back to Pure only if Tiers A+B+C on arXiv yield < 3.
-- Download PDFs, extract text via `pdftotext`, parse abstract + intro + conclusion sections (same as `matchmaking-example-2` pipeline).
-- Persist ingest log at `artifacts/corpus/<id>/ingest_log.json`.
+- **Patch 4 — Pure fallback with real abstracts.** If Tiers A+B+C on arXiv yield < 3, fall back to Pure at `researchprofiles.ku.dk` (URL is in `pure_page` on the faculty JSON). Do not stop at publication titles — fetch the individual publication pages (`/en/publications/<uuid>`) and scrape the abstract field. These are the canonical publication records for NBI staff, including geoscience/biophysics/etc. faculty who publish primarily in non-arXiv journals. Rate limit 1 req/sec. Skip publications older than 3 years (we want *recent* work). Keep up to 10 for the background step, and up to 3 for the ongoing-work step (Pure doesn't expose full PDFs reliably, so for these people the ongoing_text is built from abstracts rather than full papers — log the shallower treatment in the node).
+- Download PDFs from arXiv PDFs where available, extract text via `pdftotext`, parse abstract + intro + conclusion sections (same as `matchmaking-example-2` pipeline).
+- Persist ingest log at `artifacts/corpus/<id>/ingest_log.json`, including the source (`arxiv_tier_A` / `arxiv_tier_B` / `arxiv_tier_C` / `pure_abstract`) per paper.
 
 ### 4. Ongoing-work extraction: four explicit categories
 
