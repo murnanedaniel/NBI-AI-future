@@ -11,6 +11,7 @@ import { RateRamp } from "./scenes/RateRamp";
 import { TrackingProblem } from "./scenes/TrackingProblem";
 import { GnnSolution } from "./scenes/GnnSolution";
 import { SpeedJourney } from "./scenes/SpeedJourney";
+import { AiForAi } from "./scenes/AiForAi";
 import { PlaceholderScene } from "./scenes/PlaceholderScene";
 import { EasterRelease } from "./scenes/EasterRelease";
 import { EasterBug } from "./scenes/EasterBug";
@@ -36,6 +37,7 @@ const SCENE_COMPONENTS: Partial<Record<SceneId, SceneComponent>> = {
   trackingProblem: TrackingProblem,
   gnnSolution: GnnSolution,
   speedJourney: SpeedJourney,
+  aiForAi: AiForAi,
   easter1Release: EasterRelease as unknown as SceneComponent,
   easter2Bug: EasterBug as unknown as SceneComponent,
   easter3SmokingGun: EasterSmokingGun as unknown as SceneComponent,
