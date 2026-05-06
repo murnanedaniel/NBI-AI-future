@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { asset } from "@/lib/asset";
 
 // ─────────────────────────────────────────────────────────────────────
 // Real, verified literature on agentic AI across physics-adjacent fields,
@@ -496,7 +497,7 @@ function FeaturedSchwartz() {
     >
       <div className="flex items-center gap-5 bg-zinc-900/85 border border-white/15 shadow-2xl rounded-sm p-4 w-[560px]">
         <img
-          src="/img/schwartz_claude_first-01.png"
+          src={asset("/img/schwartz_claude_first-01.png")}
           alt="Schwartz × Claude paper first page"
           className="w-[120px] h-auto rounded-sm border border-white/10"
         />

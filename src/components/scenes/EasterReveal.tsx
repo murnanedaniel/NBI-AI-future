@@ -2,10 +2,11 @@
 
 import { motion } from "motion/react";
 import { EasterShell } from "./EasterShell";
+import { asset } from "@/lib/asset";
 
 // 16 real PDF pages rendered to public/img/paper/page-NN.png by pdftoppm.
 const N_PAGES = 16;
-const pageSrc = (i: number) => `/img/paper/page-${String(i + 1).padStart(2, "0")}.png`;
+const pageSrc = (i: number) => asset(`/img/paper/page-${String(i + 1).padStart(2, "0")}.png`);
 
 // Pre-computed fan-out positions for the 16 pages — 4 × 4 grid in viewport
 // units (px) with deterministic jitter so the layout is stable between

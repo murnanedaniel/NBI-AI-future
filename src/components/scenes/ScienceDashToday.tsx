@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState } from "react";
+import { asset } from "@/lib/asset";
 
 // ─────────────────────────────────────────────────────────────────────
 // ScienceDash · Para 10 walkthrough.
@@ -242,7 +243,7 @@ export function ScienceDashToday({ step }: { step: number }) {
               {step === 1 && (
                 <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0">
                   <ScreenshotView
-                    src="/img/sciencedash/home.png"
+                    src={asset("/img/sciencedash/home.png")}
                     alt="ScienceDash home — Today / Stalled / Narrative-ready / Recent runs"
                     scrollPct={60}
                     duration={11}
@@ -252,7 +253,7 @@ export function ScienceDashToday({ step }: { step: number }) {
               {step === 2 && (
                 <motion.div key="overview" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0">
                   <ScreenshotView
-                    src="/img/sciencedash/overview.png"
+                    src={asset("/img/sciencedash/overview.png")}
                     alt="Project overview — status, hypothesis, §16.1 fields, GitHub, W&B"
                     scrollPct={67}
                     duration={13}
@@ -262,7 +263,7 @@ export function ScienceDashToday({ step }: { step: number }) {
               {step === 3 && (
                 <motion.div key="plan" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0">
                   <ScreenshotView
-                    src="/img/sciencedash/plan.png"
+                    src={asset("/img/sciencedash/plan.png")}
                     alt="Brain · Plan tab — HUMAN_DIRECTIVE, PROJECT_BRIEF, MEMORY_LOG"
                     scrollPct={8}
                     duration={5}
@@ -277,7 +278,7 @@ export function ScienceDashToday({ step }: { step: number }) {
               {step >= 5 && (
                 <motion.div key="feed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0">
                   <ScreenshotView
-                    src="/img/sciencedash/feed.png"
+                    src={asset("/img/sciencedash/feed.png")}
                     alt="Feed — decisions, suggestions, status from local-claude, workhorses, review-agent"
                     scrollPct={39}
                     duration={8}

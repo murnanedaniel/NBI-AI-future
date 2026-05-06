@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { asset } from "@/lib/asset";
 
 export function AiForAi({ step }: { step: number }) {
   return (
@@ -30,7 +31,7 @@ export function AiForAi({ step }: { step: number }) {
           animate={{ opacity: 1, transition: { duration: 0.7 } }}
         >
           <motion.img
-            src="/img/quirks_fig1.png"
+            src={asset("/img/quirks_fig1.png")}
             alt="quirky tracks (BSM) — same model, standard tracks vs quirks"
             className="max-h-[72vh] max-w-[1100px] w-auto h-auto object-contain"
             initial={{ opacity: 0, scale: 0.98 }}

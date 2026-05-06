@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { asset } from "@/lib/asset";
 
 // Real ATLAS ITk event 000008843 — x/y projection of the barrel slice
 // (|z| < 1 m). Preprocessed in scripts/prep_tracking_event.py from the raw
@@ -181,7 +182,7 @@ export function GnnSolution({ step }: { step: number }) {
     const cleanup: Array<() => void> = [];
 
     (async () => {
-      const res = await fetch("/data/tracking_event.bin");
+      const res = await fetch(asset("/data/tracking_event.bin"));
       if (!res.ok || disposed) return;
       const buf = await res.arrayBuffer();
       if (disposed) return;

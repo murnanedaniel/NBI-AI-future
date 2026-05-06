@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { asset } from "@/lib/asset";
 
 const TRANSCRIPT = [
   "[move beamline]",
@@ -100,7 +101,7 @@ export function RorvigRunPhone({ step }: { step: number }) {
             {/* Map - top ~58% */}
             <div className="relative mx-3 mt-1 h-[55%] rounded-2xl overflow-hidden border border-white/5">
               <motion.img
-                src="/img/rorvigrun.png"
+                src={asset("/img/rorvigrun.png")}
                 alt="Rorvig run map"
                 className="absolute inset-0 w-full h-full object-cover"
                 initial={{ opacity: 0, scale: 1.04 }}

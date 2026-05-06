@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { LoopsViz } from "./LoopsViz";
+import { asset } from "@/lib/asset";
 
 // One-shot aside during Para 3:
 // "We have shown for example that the exact same model can be trained to
@@ -44,7 +45,7 @@ export function QuirksAside({ step = 0 }: { step?: number }) {
             </motion.div>
 
             <motion.img
-              src="/img/quirks_fig1.png"
+              src={asset("/img/quirks_fig1.png")}
               alt="Quirky tracks (arXiv 2410.00269 fig 1)"
               className="max-h-[60vh] w-auto rounded-md shadow-2xl border border-white/10"
               initial={{ opacity: 0, scale: 0.96 }}
