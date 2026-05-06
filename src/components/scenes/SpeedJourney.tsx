@@ -11,9 +11,10 @@ type Stop = {
 };
 
 const STOPS: Stop[] = [
-  { id: "a", year: "2020", time: "~30 seconds",      sub: "Exa.TrkX prototype · CPU baseline", stateKey: "past" },
-  { id: "b", year: "2025", time: "~100 milliseconds", sub: "GNN4ITk · single GPU",             stateKey: "now" },
-  { id: "c", year: "target", time: "~10 milliseconds",  sub: "trigger-level · projected",       stateKey: "projected" },
+  { id: "a", year: "2021", time: "~60 seconds",       sub: "Exa.TrkX prototype · CPU baseline",         stateKey: "past" },
+  { id: "b", year: "2026", time: "~100 milliseconds", sub: "GNN4ITk · single GPU",                       stateKey: "now" },
+  { id: "c", year: "target", time: "~10 milliseconds", sub: "trigger-level · projected",                 stateKey: "projected" },
+  { id: "d", year: "2031", time: "100 kHz",           sub: "1000 GPUs · ATLAS software trigger · projected", stateKey: "projected" },
 ];
 
 export function SpeedJourney({ step }: { step: number }) {
@@ -22,7 +23,12 @@ export function SpeedJourney({ step }: { step: number }) {
   const left = 80;
   const right = W - 80;
   const axisY = H - 90;
-  const positions = [left, (left + right) / 2, right];
+  const positions = [
+    left,
+    left + (right - left) / 3,
+    left + (2 * (right - left)) / 3,
+    right,
+  ];
 
   return (
     <motion.div
@@ -34,8 +40,7 @@ export function SpeedJourney({ step }: { step: number }) {
       <div className="absolute inset-0 flex flex-col p-10 md:p-14">
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-[11px] uppercase tracking-[0.3em] text-sky-300/70">Act 1 · the journey</div>
-            <div className="mt-2 font-serif italic text-zinc-100 text-[clamp(26px,2.8vw,42px)] leading-tight">
+<div className="mt-2 font-serif italic text-zinc-100 text-[clamp(26px,2.8vw,42px)] leading-tight">
               how fast we got, how fast we&rsquo;re getting.
             </div>
           </div>
@@ -63,7 +68,7 @@ export function SpeedJourney({ step }: { step: number }) {
             {STOPS.map((s, i) => {
               const x = positions[i];
               const visible = step >= i;
-              const clockR = i === 0 ? 28 : i === 1 ? 16 : 8;
+              const clockR = i === 0 ? 28 : i === 1 ? 16 : i === 2 ? 8 : 5;
               return (
                 <motion.g
                   key={s.id}
@@ -89,17 +94,30 @@ export function SpeedJourney({ step }: { step: number }) {
           </svg>
         </div>
 
-        <div className="flex items-center justify-center">
-          {step >= 2 && (
-            <motion.div
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0, transition: { duration: 0.8, delay: 0.4 } }}
-              className="font-serif italic text-zinc-300 text-[clamp(20px,2vw,30px)] text-center"
-            >
-              five years.<br />
-              <span className="text-zinc-100">three thousand times faster.</span>
-            </motion.div>
-          )}
+        <div className="flex flex-col items-center justify-center gap-3 min-h-[140px]">
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{
+              opacity: step >= 2 ? 1 : 0,
+              y: step >= 2 ? 0 : 6,
+              transition: { duration: 0.8, delay: step >= 2 ? 0.4 : 0 },
+            }}
+            className="font-serif italic text-zinc-300 text-[clamp(20px,2vw,30px)] text-center"
+          >
+            five years.<br />
+            <span className="text-zinc-100">six hundred times faster.</span>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{
+              opacity: step >= 3 ? 1 : 0,
+              y: step >= 3 ? 0 : 6,
+              transition: { duration: 0.7, delay: step >= 3 ? 0.3 : 0 },
+            }}
+            className="font-serif italic text-zinc-300 text-[clamp(16px,1.4vw,22px)] text-center"
+          >
+            and forward.
+          </motion.div>
         </div>
       </div>
     </motion.div>

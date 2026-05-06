@@ -156,7 +156,7 @@ function Header() {
     >
       <div>
         <div className="text-[10px] uppercase tracking-[0.3em] text-ink/50 font-mono">
-          Act 3 · faculty · day 2027 · <span ref={clockRef}>08:47:00</span>
+          <span ref={clockRef}>08:47:00</span>
         </div>
         <div className="mt-1 font-serif italic text-ink text-[clamp(22px,2.3vw,34px)] leading-tight">
           good morning, prof.

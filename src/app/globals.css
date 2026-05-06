@@ -78,3 +78,12 @@ body {
 .ink-shadow {
   box-shadow: 0 14px 40px -14px rgba(20,20,20,0.25), 0 0 0 1px rgba(20,20,20,0.08);
 }
+
+/* Hide scrollbars on auto-scrolled regions (terminal feed, etc). */
+.scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}

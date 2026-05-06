@@ -1,0 +1,550 @@
+{
+  "n_jobs": 61,
+  "n_gpu_jobs": 38,
+  "total_cpu_h": 10598.7,
+  "total_gpu_h": 293.2,
+  "total_elapsed_h": 63.6,
+  "states": {
+    "COMPLETED": 33,
+    "FAILED": 9,
+    "CANCELLED by 81784": 13,
+    "TIMEOUT": 6
+  },
+  "jobs_top": [
+    {
+      "jobid": "50767480",
+      "partition": "gpu_ss11",
+      "cpus": 512,
+      "gpus": 16,
+      "elapsed_s": 28804,
+      "cpu_h": 4096.6,
+      "gpu_h": 128.02,
+      "state": "TIMEOUT"
+    },
+    {
+      "jobid": "50767478",
+      "partition": "gpu_ss11",
+      "cpus": 512,
+      "gpus": 16,
+      "elapsed_s": 14576,
+      "cpu_h": 2073.0,
+      "gpu_h": 64.78,
+      "state": "COMPLETED"
+    },
+    {
+      "jobid": "50814801",
+      "partition": "gpu_ss11",
+      "cpus": 512,
+      "gpus": 16,
+      "elapsed_s": 12456,
+      "cpu_h": 1771.5,
+      "gpu_h": 55.36,
+      "state": "COMPLETED"
+    },
+    {
+      "jobid": "51084030",
+      "partition": "regular_milan_ss11",
+      "cpus": 1024,
+      "gpus": 0,
+      "elapsed_s": 1002,
+      "cpu_h": 285.0,
+      "gpu_h": 0.0,
+      "state": "FAILED"
+    },
+    {
+      "jobid": "50937751",
+      "partition": "regular_milan_ss11",
+      "cpus": 768,
+      "gpus": 0,
+      "elapsed_s": 1089,
+      "cpu_h": 232.3,
+      "gpu_h": 0.0,
+      "state": "FAILED"
+    },
+    {
+      "jobid": "50937750",
+      "partition": "regular_milan_ss11",
+      "cpus": 768,
+      "gpus": 0,
+      "elapsed_s": 1035,
+      "cpu_h": 220.8,
+      "gpu_h": 0.0,
+      "state": "FAILED"
+    },
+    {
+      "jobid": "51008360",
+      "partition": "shared_urgent_gpu_ss11",
+      "cpus": 32,
+      "gpus": 1,
+      "elapsed_s": 14431,
+      "cpu_h": 128.3,
+      "gpu_h": 4.01,
+      "state": "TIMEOUT"
+    },
+    {
+      "jobid": "51035584",
+      "partition": "shared_urgent_gpu_ss11",
+      "cpus": 32,
+      "gpus": 1,
+      "elapsed_s": 14420,
+      "cpu_h": 128.2,
+      "gpu_h": 4.01,
+      "state": "TIMEOUT"
+    }
+  ],
+  "bumps": [
+    {
+      "idx": 129,
+      "jobid": "50936528",
+      "cpu_h": 66.63,
+      "gpu_h": 0.0,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 140,
+      "jobid": "50936557",
+      "cpu_h": 66.2,
+      "gpu_h": 0.0,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 192,
+      "jobid": "50937393",
+      "cpu_h": 11.09,
+      "gpu_h": 0.0,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 192,
+      "jobid": "50937394",
+      "cpu_h": 11.09,
+      "gpu_h": 0.0,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 206,
+      "jobid": "50937680",
+      "cpu_h": 3.48,
+      "gpu_h": 0.0,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 206,
+      "jobid": "50937682",
+      "cpu_h": 3.48,
+      "gpu_h": 0.0,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 219,
+      "jobid": "50937750",
+      "cpu_h": 220.8,
+      "gpu_h": 0.0,
+      "state": "FAILED"
+    },
+    {
+      "idx": 219,
+      "jobid": "50937751",
+      "cpu_h": 232.32,
+      "gpu_h": 0.0,
+      "state": "FAILED"
+    },
+    {
+      "idx": 359,
+      "jobid": "50944382",
+      "cpu_h": 45.65,
+      "gpu_h": 0.0,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 359,
+      "jobid": "50944428",
+      "cpu_h": 46.08,
+      "gpu_h": 0.0,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 371,
+      "jobid": "50956764",
+      "cpu_h": 20.91,
+      "gpu_h": 0.0,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 371,
+      "jobid": "50956766",
+      "cpu_h": 20.91,
+      "gpu_h": 0.0,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 509,
+      "jobid": "50958574",
+      "cpu_h": 0.0,
+      "gpu_h": 0.0,
+      "state": "CANCELLED by 81784"
+    },
+    {
+      "idx": 628,
+      "jobid": "50982051",
+      "cpu_h": 110.2,
+      "gpu_h": 3.44,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 799,
+      "jobid": "50987827",
+      "cpu_h": 69.72,
+      "gpu_h": 2.18,
+      "state": "CANCELLED by 81784"
+    },
+    {
+      "idx": 850,
+      "jobid": "50990529",
+      "cpu_h": 10.56,
+      "gpu_h": 0.33,
+      "state": "CANCELLED by 81784"
+    },
+    {
+      "idx": 920,
+      "jobid": "50990953",
+      "cpu_h": 21.15,
+      "gpu_h": 0.66,
+      "state": "CANCELLED by 81784"
+    },
+    {
+      "idx": 1020,
+      "jobid": "50991645",
+      "cpu_h": 82.83,
+      "gpu_h": 2.59,
+      "state": "CANCELLED by 81784"
+    },
+    {
+      "idx": 1020,
+      "jobid": "50992247",
+      "cpu_h": 32.01,
+      "gpu_h": 0.0,
+      "state": "TIMEOUT"
+    },
+    {
+      "idx": 1268,
+      "jobid": "50814801",
+      "cpu_h": 1771.52,
+      "gpu_h": 55.36,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1289,
+      "jobid": "51008360",
+      "cpu_h": 128.28,
+      "gpu_h": 4.01,
+      "state": "TIMEOUT"
+    },
+    {
+      "idx": 1307,
+      "jobid": "50767478",
+      "cpu_h": 2073.03,
+      "gpu_h": 64.78,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1346,
+      "jobid": "50957922",
+      "cpu_h": 0.07,
+      "gpu_h": 0.0,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1385,
+      "jobid": "50981537",
+      "cpu_h": 1.2,
+      "gpu_h": 0.04,
+      "state": "FAILED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1424,
+      "jobid": "50995622",
+      "cpu_h": 112.7,
+      "gpu_h": 3.52,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1449,
+      "jobid": "51038333",
+      "cpu_h": 0.0,
+      "gpu_h": 0.0,
+      "state": "CANCELLED by 81784"
+    },
+    {
+      "idx": 1449,
+      "jobid": "51038335",
+      "cpu_h": 0.0,
+      "gpu_h": 0.0,
+      "state": "CANCELLED by 81784"
+    },
+    {
+      "idx": 1463,
+      "jobid": "50995625",
+      "cpu_h": 0.31,
+      "gpu_h": 0.0,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1502,
+      "jobid": "50997179",
+      "cpu_h": 1.24,
+      "gpu_h": 0.0,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1541,
+      "jobid": "51035566",
+      "cpu_h": 128.0,
+      "gpu_h": 4.0,
+      "state": "TIMEOUT",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1580,
+      "jobid": "51035584",
+      "cpu_h": 128.18,
+      "gpu_h": 4.01,
+      "state": "TIMEOUT",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1614,
+      "jobid": "51054628",
+      "cpu_h": 1.34,
+      "gpu_h": 0.04,
+      "state": "CANCELLED by 81784"
+    },
+    {
+      "idx": 1619,
+      "jobid": "51054633",
+      "cpu_h": 1.34,
+      "gpu_h": 0.04,
+      "state": "CANCELLED by 81784",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1658,
+      "jobid": "51054690",
+      "cpu_h": 1.16,
+      "gpu_h": 0.04,
+      "state": "FAILED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1697,
+      "jobid": "51054692",
+      "cpu_h": 1.16,
+      "gpu_h": 0.04,
+      "state": "FAILED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1724,
+      "jobid": "51054771",
+      "cpu_h": 36.4,
+      "gpu_h": 1.14,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 1724,
+      "jobid": "51054772",
+      "cpu_h": 37.23,
+      "gpu_h": 1.16,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 1736,
+      "jobid": "51058643",
+      "cpu_h": 0.1,
+      "gpu_h": 0.0,
+      "state": "FAILED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1775,
+      "jobid": "51058703",
+      "cpu_h": 0.06,
+      "gpu_h": 0.0,
+      "state": "FAILED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1814,
+      "jobid": "51058800",
+      "cpu_h": 40.71,
+      "gpu_h": 1.27,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1841,
+      "jobid": "51083878",
+      "cpu_h": 25.88,
+      "gpu_h": 0.0,
+      "state": "FAILED"
+    },
+    {
+      "idx": 1853,
+      "jobid": "51058801",
+      "cpu_h": 37.42,
+      "gpu_h": 1.17,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1866,
+      "jobid": "51084030",
+      "cpu_h": 285.01,
+      "gpu_h": 0.0,
+      "state": "FAILED"
+    },
+    {
+      "idx": 1878,
+      "jobid": "51084506",
+      "cpu_h": 51.63,
+      "gpu_h": 0.0,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 1884,
+      "jobid": "51084853",
+      "cpu_h": 49.78,
+      "gpu_h": 0.0,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 1890,
+      "jobid": "51085051",
+      "cpu_h": 20.76,
+      "gpu_h": 0.0,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 1892,
+      "jobid": "51061527",
+      "cpu_h": 128.04,
+      "gpu_h": 4.0,
+      "state": "TIMEOUT",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1928,
+      "jobid": "51085224",
+      "cpu_h": 35.09,
+      "gpu_h": 1.1,
+      "state": "COMPLETED"
+    },
+    {
+      "idx": 1931,
+      "jobid": "51070346",
+      "cpu_h": 61.19,
+      "gpu_h": 1.91,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 1970,
+      "jobid": "51095573",
+      "cpu_h": 34.44,
+      "gpu_h": 1.08,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 2009,
+      "jobid": "51101350",
+      "cpu_h": 33.32,
+      "gpu_h": 1.04,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 2048,
+      "jobid": "51101351",
+      "cpu_h": 33.35,
+      "gpu_h": 1.04,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 2087,
+      "jobid": "51103794",
+      "cpu_h": 31.72,
+      "gpu_h": 0.99,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 2126,
+      "jobid": "51103795",
+      "cpu_h": 31.85,
+      "gpu_h": 1.0,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 2131,
+      "jobid": "51095572",
+      "cpu_h": 56.68,
+      "gpu_h": 1.77,
+      "state": "CANCELLED by 81784"
+    },
+    {
+      "idx": 2165,
+      "jobid": "51107318",
+      "cpu_h": 15.62,
+      "gpu_h": 0.49,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 2175,
+      "jobid": "51100747",
+      "cpu_h": 6.13,
+      "gpu_h": 0.19,
+      "state": "CANCELLED by 81784"
+    },
+    {
+      "idx": 2204,
+      "jobid": "51107321",
+      "cpu_h": 15.86,
+      "gpu_h": 0.5,
+      "state": "COMPLETED",
+      "synthetic_idx": true
+    },
+    {
+      "idx": 2226,
+      "jobid": "51106759",
+      "cpu_h": 4.61,
+      "gpu_h": 0.14,
+      "state": "CANCELLED by 81784"
+    },
+    {
+      "idx": 2226,
+      "jobid": "51106760",
+      "cpu_h": 4.61,
+      "gpu_h": 0.14,
+      "state": "CANCELLED by 81784"
+    },
+    {
+      "idx": 2243,
+      "jobid": "50767480",
+      "cpu_h": 4096.57,
+      "gpu_h": 128.02,
+      "state": "TIMEOUT",
+      "synthetic_idx": true
+    }
+  ]
+}

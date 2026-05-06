@@ -89,3 +89,4 @@ next-env.d.ts
 *.slurm.out
 slurm-*.out
 sacct*.txt
+scripts/phase_a/__pycache__/

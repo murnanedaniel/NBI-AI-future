@@ -17,14 +17,22 @@ export function useElapsed(running: boolean) {
     }
     startRef.current = performance.now();
     let raf = 0;
+    let alive = true;
+    let lastSec = -1;
     const tick = () => {
+      if (!alive) return;
       const now = performance.now();
       const run = startRef.current != null ? now - startRef.current : 0;
-      setElapsed((accRef.current + run) / 1000);
+      const sec = Math.floor((accRef.current + run) / 1000);
+      // only trigger a React re-render when the displayed second changes
+      if (sec !== lastSec) {
+        lastSec = sec;
+        setElapsed((accRef.current + run) / 1000);
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => { alive = false; cancelAnimationFrame(raf); };
   }, [running]);
 
   const reset = () => {

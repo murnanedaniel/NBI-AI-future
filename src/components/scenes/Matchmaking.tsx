@@ -1,7 +1,8 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState } from "react";
+import { WINNING_PAIR } from "@/lib/winningPair";
 
 type Person = {
   name: string;
@@ -10,79 +11,68 @@ type Person = {
 };
 
 const A: Person = {
-  name: "Prof. [Quantum Many-Body]",
-  group: "Condensed Matter Theory",
-  bullets: [
-    "Neural-network quantum states for strongly correlated systems",
-    "Variational wavefunctions on frustrated lattices",
-    "Symmetry-constrained machine-learning ansätze",
-  ],
+  name: WINNING_PAIR.a.name,
+  group: WINNING_PAIR.a.group,
+  bullets: [...WINNING_PAIR.a.bullets],
 };
 
 const B: Person = {
-  name: "Prof. [Theoretical Cosmology]",
-  group: "Cosmology & Astrophysics",
-  bullets: [
-    "Bayesian inference of inflation models from CMB polarization",
-    "Large-scale structure as a probe of dark energy",
-    "Non-Gaussianity in primordial perturbations",
-  ],
+  name: WINNING_PAIR.b.name,
+  group: WINNING_PAIR.b.group,
+  bullets: [...WINNING_PAIR.b.bullets],
 };
 
-const ABSTRACT =
-  "We propose a three-year collaboration adapting the symmetry-constrained neural wave functions developed for frustrated magnets to the task of Bayesian inference of inflation models from high-resolution CMB polarization data. Both domains share a common mathematical substrate: high-dimensional probabilistic models with non-trivial constraint structure. We will (i) formalize the mapping between variational ansätze and cosmological posterior estimators, (ii) benchmark on the kagome Heisenberg antiferromagnet and on the Planck+BICEP polarization analysis, and (iii) release an open-source inference toolkit bridging the condensed-matter and cosmology communities.";
+const ABSTRACT = WINNING_PAIR.abstract;
 const ABSTRACT_WORDS = ABSTRACT.split(/\s+/);
+const METHODS = [...WINNING_PAIR.methods];
 
-const METHODS = [
-  "Translate frustrated-magnet variational code to CMB posterior space",
-  "Joint benchmark: kagome Heisenberg × Planck/BICEP polarization",
-  "Open-source bridging library, Python + JAX",
-];
+// Daniel's prose intro for the pair (step 0). Italic, sits in the middle
+// column where the abstract will later stream.
+const PROSE = "But they have both been looking at the same problem: how to read the iron-redox state of those tephra shards — Eliza, because the redox state controls how much sulphate the eruption pushed into the stratosphere; Per, because his spin-Hamiltonian toolkit can invert bulk magnetic susceptibility back to Fe³⁺/Fe²⁺ ratios without destroying the shard.";
 
-type Phase = "idle" | "typing" | "nodes" | "streaming" | "done";
-
-export function Matchmaking() {
-  const [phase, setPhase] = useState<Phase>("idle");
+export function Matchmaking({ step }: { step: number }) {
   const [typedA, setTypedA] = useState("");
   const [typedB, setTypedB] = useState("");
   const [streamedWords, setStreamedWords] = useState(0);
 
+  // Auto-type names on mount. Does not depend on step.
   useEffect(() => {
-    const timers: number[] = [];
-    timers.push(window.setTimeout(() => setPhase("typing"), 1200));
-
     const targetA = A.name;
     const targetB = B.name;
     let i = 0;
-    const typeTimer = window.setInterval(() => {
+    const id = window.setInterval(() => {
       i++;
       if (i <= targetA.length) setTypedA(targetA.slice(0, i));
-      else if (i <= targetA.length + targetB.length + 3) setTypedB(targetB.slice(0, i - targetA.length - 3));
-      else {
-        clearInterval(typeTimer);
-        setPhase("nodes");
-        timers.push(window.setTimeout(() => setPhase("streaming"), 1200));
+      else if (i <= targetA.length + 3) {
+        // small pause then start B
+      } else if (i <= targetA.length + 3 + targetB.length) {
+        setTypedB(targetB.slice(0, i - targetA.length - 3));
+      } else {
+        clearInterval(id);
       }
     }, 55);
-    timers.push(typeTimer);
-
-    return () => timers.forEach(clearTimeout);
+    return () => clearInterval(id);
   }, []);
 
+  // Stream abstract once we hit step 1.
   useEffect(() => {
-    if (phase !== "streaming") return;
+    if (step < 1) {
+      setStreamedWords(0);
+      return;
+    }
     const id = window.setInterval(() => {
       setStreamedWords((w) => {
         if (w >= ABSTRACT_WORDS.length) {
           clearInterval(id);
-          setPhase("done");
           return w;
         }
         return w + 1;
       });
-    }, 180);
+    }, 110); // faster than original 180ms — pacing fix from storyboard
     return () => clearInterval(id);
-  }, [phase]);
+  }, [step]);
+
+  const abstractDone = streamedWords >= ABSTRACT_WORDS.length;
 
   return (
     <motion.div
@@ -98,10 +88,10 @@ export function Matchmaking() {
         <div className="flex items-start justify-between">
           <div>
             <div className="text-[11px] uppercase tracking-[0.3em] text-sky-700/70 font-mono">
-              Act 3 · Live · collaboration drafted in 60 seconds
+              live generation · opt-in only
             </div>
             <div className="mt-2 font-serif italic text-ink text-[clamp(28px,3.3vw,46px)] leading-tight">
-              Name two NBI faculty from different groups.
+              {step === 0 ? "Two researchers, one problem." : "The winning ticket — drafted in 60 seconds."}
             </div>
           </div>
           <div className="font-mono text-[11px] text-ink/50 text-right tabular-nums">
@@ -110,15 +100,41 @@ export function Matchmaking() {
           </div>
         </div>
 
-        <div className="flex-1 grid grid-cols-[280px_1fr_280px] gap-8 items-center mt-6">
-          <PersonCard person={A} typed={typedA} show={phase !== "idle"} />
+        <div className="flex-1 grid grid-cols-[300px_1fr_300px] gap-8 items-stretch mt-6">
+          <PersonCard person={A} typed={typedA} />
 
-          <GrantCard
-            phase={phase}
-            streamedWords={streamedWords}
-          />
+          <div className="relative">
+            <AnimatePresence mode="wait">
+              {step === 0 ? (
+                <motion.div
+                  key="prose"
+                  className="absolute inset-0 flex items-center justify-center"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0, transition: { duration: 0.8, delay: 0.4 } }}
+                  exit={{ opacity: 0, transition: { duration: 0.4 } }}
+                >
+                  <div className="font-serif italic text-ink text-[clamp(18px,1.7vw,26px)] leading-[1.55] text-center px-6 max-w-[760px]">
+                    {PROSE}
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="grant"
+                  className="absolute inset-0"
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1, transition: { duration: 0.6 } }}
+                  exit={{ opacity: 0, transition: { duration: 0.4 } }}
+                >
+                  <GrantCard
+                    streamedWords={streamedWords}
+                    abstractDone={abstractDone}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
-          <PersonCard person={B} typed={typedB} show={phase !== "idle"} mirror />
+          <PersonCard person={B} typed={typedB} mirror />
         </div>
 
         <motion.div
@@ -134,33 +150,33 @@ export function Matchmaking() {
   );
 }
 
-function PersonCard({ person, typed, show, mirror }: { person: Person; typed: string; show: boolean; mirror?: boolean }) {
+function PersonCard({ person, typed, mirror }: { person: Person; typed: string; mirror?: boolean }) {
   return (
     <motion.div
       className={`bg-paper/60 ink-shadow rounded-md p-4 ${mirror ? "text-right" : ""}`}
       initial={{ opacity: 0, x: mirror ? 14 : -14 }}
-      animate={{ opacity: show ? 1 : 0, x: show ? 0 : mirror ? 14 : -14, transition: { duration: 0.6, delay: 0.2 } }}
+      animate={{ opacity: 1, x: 0, transition: { duration: 0.6, delay: 0.2 } }}
     >
       <div className={`flex items-center gap-3 ${mirror ? "flex-row-reverse" : ""}`}>
-        <div className="h-10 w-10 rounded-full bg-sky-700/10 border border-sky-700/30 flex items-center justify-center text-sky-700 font-serif italic">
+        <div className="h-12 w-12 rounded-full bg-sky-700/10 border border-sky-700/30 flex items-center justify-center text-sky-700 font-serif italic text-[18px]">
           {person.name.split(" ")[0][0]}
         </div>
         <div className={mirror ? "text-right" : ""}>
-          <div className="font-mono text-[10px] uppercase tracking-wider text-ink/50">{person.group}</div>
-          <div className="font-serif text-ink text-[16px] leading-tight">
+          <div className="font-mono text-[11px] uppercase tracking-wider text-ink/50">{person.group}</div>
+          <div className="font-serif text-ink text-[clamp(18px,1.6vw,24px)] leading-tight">
             {typed}
-            <span className="inline-block w-[6px] h-[14px] bg-ink/40 ml-0.5 align-middle animate-pulse" style={{ visibility: typed.length === person.name.length ? "hidden" : "visible" }} />
+            <span className="inline-block w-[6px] h-[16px] bg-ink/40 ml-0.5 align-middle animate-pulse" style={{ visibility: typed.length === person.name.length ? "hidden" : "visible" }} />
           </div>
         </div>
       </div>
-      <ul className={`mt-3 space-y-1.5 text-[12px] text-ink/70 font-sans leading-snug ${mirror ? "text-right" : ""}`}>
+      <ul className={`mt-3 space-y-1.5 text-[clamp(13px,1.1vw,16px)] text-ink/70 font-sans leading-snug ${mirror ? "text-right" : ""}`}>
         {person.bullets.map((b, i) => (
           <motion.li
             key={i}
             className="flex items-start gap-2"
             style={{ flexDirection: mirror ? "row-reverse" : "row" }}
             initial={{ opacity: 0 }}
-            animate={{ opacity: show ? 1 : 0, transition: { delay: 0.6 + i * 0.12 } }}
+            animate={{ opacity: 1, transition: { delay: 0.6 + i * 0.12 } }}
           >
             <span className="text-sky-700/60 text-[11px] leading-tight mt-0.5">·</span>
             <span>{b}</span>
@@ -171,49 +187,37 @@ function PersonCard({ person, typed, show, mirror }: { person: Person; typed: st
   );
 }
 
-function GrantCard({ phase, streamedWords }: { phase: Phase; streamedWords: number }) {
+function GrantCard({ streamedWords, abstractDone }: { streamedWords: number; abstractDone: boolean }) {
   const streamed = ABSTRACT_WORDS.slice(0, streamedWords).join(" ");
-  const showMethods = phase === "done";
 
   return (
-    <motion.div
-      className="relative bg-paper ink-shadow rounded-md p-6 min-h-[360px]"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{
-        opacity: phase === "streaming" || phase === "done" || phase === "nodes" ? 1 : 0.3,
-        scale: 1,
-        transition: { duration: 0.6 },
-      }}
-    >
+    <motion.div className="relative bg-paper ink-shadow rounded-md p-6 h-full overflow-hidden">
       <div className="flex items-center justify-between pb-3 border-b border-ink/10">
         <div className="font-mono text-[10px] uppercase tracking-wider text-ink/50">
           Proposed joint investigation · 2026–2029
         </div>
         <div className="flex items-center gap-2 font-mono text-[10px] text-ink/50">
-          <span className={`h-2 w-2 rounded-full ${phase === "streaming" ? "bg-emerald-500 animate-pulse" : phase === "done" ? "bg-emerald-600" : "bg-ink/20"}`} />
-          {phase === "streaming" ? "streaming" : phase === "done" ? "complete" : "waiting…"}
+          <span className={`h-2 w-2 rounded-full ${abstractDone ? "bg-emerald-600" : "bg-emerald-500 animate-pulse"}`} />
+          {abstractDone ? "complete" : "streaming"}
         </div>
       </div>
 
-      <motion.div
-        className="mt-3 font-serif text-ink text-[clamp(18px,1.7vw,26px)] leading-tight"
-        animate={{ opacity: phase === "streaming" || phase === "done" ? 1 : 0.3 }}
-      >
-        Neural Inference Bridges: Unifying Condensed-Matter Variational Wave Functions and Cosmological Bayesian Pipelines
-      </motion.div>
-
-      <div className="mt-3 font-sans text-[13.5px] text-ink/80 leading-relaxed min-h-[140px]">
-        {streamed}
-        {phase === "streaming" && <span className="inline-block w-[6px] h-[13px] bg-ink/50 ml-0.5 align-middle animate-pulse" />}
+      <div className="mt-3 font-serif text-ink text-[clamp(20px,1.95vw,30px)] leading-tight">
+        {WINNING_PAIR.title}
       </div>
 
-      {showMethods && (
+      <div className="mt-3 font-sans text-[clamp(14.5px,1.25vw,18px)] text-ink/85 leading-relaxed min-h-[140px]">
+        {streamed}
+        {!abstractDone && <span className="inline-block w-[6px] h-[15px] bg-ink/50 ml-0.5 align-middle animate-pulse" />}
+      </div>
+
+      {abstractDone && (
         <motion.div
           className="mt-5 pt-4 border-t border-ink/10 grid grid-cols-[1fr_auto] gap-6 items-start"
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
         >
-          <ul className="space-y-1.5 text-[12.5px] text-ink/70">
+          <ul className="space-y-1.5 text-[clamp(13.5px,1.15vw,17px)] text-ink/80">
             {METHODS.map((m, i) => (
               <motion.li
                 key={i}
@@ -227,14 +231,14 @@ function GrantCard({ phase, streamedWords }: { phase: Phase; streamedWords: numb
             ))}
           </ul>
           <div className="font-mono text-[11px] text-ink/60 text-right">
-            <div>~1.4M DKK</div>
-            <div>3 years</div>
-            <div>1 PhD + 1 postdoc</div>
+            <div>{WINNING_PAIR.budget.dkk}</div>
+            <div>{WINNING_PAIR.budget.years} years</div>
+            <div>{WINNING_PAIR.budget.people}</div>
           </div>
         </motion.div>
       )}
 
-      {showMethods && (
+      {abstractDone && (
         <motion.div
           className="mt-4 font-mono text-[10px] text-ink/40 flex items-center gap-2"
           initial={{ opacity: 0 }}

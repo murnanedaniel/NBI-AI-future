@@ -14,8 +14,7 @@ export function PlaceholderScene({ id, label, act }: Props) {
       exit={{ opacity: 0, transition: { duration: 0.4 } }}
     >
       <div className="text-center max-w-2xl px-8">
-        <div className="text-[11px] uppercase tracking-[0.3em] text-sky-300/70">Act {act}</div>
-        <div className="mt-3 text-[clamp(36px,5vw,72px)] font-serif italic text-zinc-100 leading-tight">
+        <div className="text-[clamp(36px,5vw,72px)] font-serif italic text-zinc-100 leading-tight">
           {label}
         </div>
         <div className="mt-6 font-mono text-[11px] text-zinc-600">scene: {id}</div>

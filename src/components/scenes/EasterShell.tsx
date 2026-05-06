@@ -24,7 +24,7 @@ export function EasterShell({ beat, total = 10, children, headline, hint, align 
         <div className="flex items-start justify-between">
           <div>
             <div className="text-[11px] uppercase tracking-[0.3em] text-sky-300/70">
-              Act 2 · Easter beamspot study · {beat}/{total}
+              {beat} / {total}
             </div>
             {headline && (
               <div className="mt-2 text-[clamp(26px,3.3vw,44px)] font-serif italic text-zinc-100 leading-tight max-w-[780px]">
